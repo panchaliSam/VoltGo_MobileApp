@@ -6,6 +6,8 @@ import lk.voltgo.voltgo.data.local.entities.UserEntity
 
 @Dao
 interface UserDao {
+    @Query("SELECT COUNT(*) FROM user")
+    suspend fun countUsers(): Int
 
     @Query("SELECT * FROM user WHERE user_id = :userId")
     suspend fun getUserById(userId: String): UserEntity?
