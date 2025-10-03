@@ -32,7 +32,7 @@ data class OnboardPage(val title: String, val desc: String)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun OnboardingScreen(
-    onContinueToLogin: () -> Unit
+    onNavigateToLogin: () -> Unit
 ) {
     val pages = listOf(
         OnboardPage("Find Stations", "Discover nearby AC/DC chargers with live availability."),
@@ -148,7 +148,7 @@ fun OnboardingScreen(
                     Text("Next", color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold)
                 }
                 Button(
-                    onClick = onContinueToLogin,
+                    onClick = onNavigateToLogin,
                     colors = ButtonDefaults.buttonColors(containerColor = AppColors.TranslucentWhite20),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
@@ -170,5 +170,5 @@ fun OnboardingScreen(
 @Preview(showBackground = true)
 @Composable
 private fun OnboardingPreview() {
-    OnboardingScreen(onContinueToLogin = {})
+    OnboardingScreen(onNavigateToLogin = {})
 }

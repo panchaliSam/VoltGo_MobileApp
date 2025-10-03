@@ -8,6 +8,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -16,10 +17,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.hilt.navigation.compose.hiltViewModel
+import kotlinx.coroutines.delay
 import lk.chargehere.app.ui.theme.AppColors
+import lk.voltgo.voltgo.ui.screens.auth.SplashViewModel
 
 @Composable
-fun SplashScreen() {
+fun SplashScreen(
+    onNavigateToOnboarding: () -> Unit,
+    viewModel: SplashViewModel = hiltViewModel()
+) {
+    LaunchedEffect(Unit) {
+        delay(2000)
+        viewModel.checkAuthStatus(
+            onNavigateToOnboarding = onNavigateToOnboarding
+        )
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -93,8 +106,8 @@ fun SplashScreen() {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun SplashScreenPreview() {
-    SplashScreen()
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun SplashScreenPreview() {
+//    SplashScreen()
+//}
