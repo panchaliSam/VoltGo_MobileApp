@@ -1,34 +1,40 @@
 package lk.voltgo.voltgo
 
 import android.os.Bundle
-import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import lk.voltgo.voltgo.data.local.VoltGoDatabase
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.navigation.compose.rememberNavController
+import dagger.hilt.android.AndroidEntryPoint
+import lk.chargehere.app.navigation.NavigationGraph
+import lk.voltgo.voltgo.navigation.VoltGoNavigation
 
-class MainActivity : AppCompatActivity() {
+@AndroidEntryPoint
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+        setContent {
+            ChargeHereApp()
         }
+    }
+}
 
-        // 🔑 This actually opens the DB (creating tables on first run + triggering the seeder)
-        val db = VoltGoDatabase.getDatabase(applicationContext)
+@Composable
+fun ChargeHereApp() {
+    val navController = rememberNavController()
 
-        // Optional: touch a DAO to force open + verify
-        CoroutineScope(Dispatchers.IO).launch {
-            val count = db.userDao().countUsers() // add a simple @Query("SELECT COUNT(*) FROM UserEntity") in UserDao
-            Log.d("VoltGo", "User rows: $count")
-        }
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        VoltGoNavigation(
+            navController = navController,
+            startDestination = NavigationGraph.Auth.route,
+            modifier = Modifier.padding(innerPadding)
+        )
     }
 }

@@ -113,10 +113,10 @@ fun LoginScreen(
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 TextButton(onClick = { /* TODO: Forgot password flow */ }) {
-                    Text("Forgot password?", color = AppColors.TranslucentWhite90)
+                    Text("Forgot password?", color = Color.Black)
                 }
                 TextButton(onClick = onNavigateToRegister) {
-                    Text("Create account", color = AppColors.TranslucentWhite90)
+                    Text("Create account", color = Color.Black)
                 }
             }
 
