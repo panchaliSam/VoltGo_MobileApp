@@ -14,6 +14,7 @@ data class UserEntity(
         @ColumnInfo(name = "user_id")
         val userId: String,
 
+        //Remove
         @ColumnInfo(name = "nic")
         val nic: String,
 

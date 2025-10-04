@@ -21,4 +21,6 @@ data class EVOwnerEntity(
 
     @ColumnInfo(name = "address")
     val address: String?
+
+    //Add Vehicle
 )
