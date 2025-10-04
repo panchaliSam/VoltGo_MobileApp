@@ -14,7 +14,6 @@ object UserSeeder {
             val demoUsers = listOf(
                 UserEntity(
                     userId = "U001",
-                    nic = "991234567V",
                     displayName = "John",
                     phone = "0771234567",
                     email = "johnDeoe@gmail.com",
@@ -25,7 +24,6 @@ object UserSeeder {
                 ),
                 UserEntity(
                     userId = "U002",
-                    nic = "902345678V",
                     displayName = "Operator User",
                     phone = "0779876543",
                     email = "operator@example.com",

@@ -8,7 +8,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import lk.voltgo.voltgo.data.local.dao.*
 import lk.voltgo.voltgo.data.local.entities.*
 import lk.voltgo.voltgo.data.local.seeders.EVOwnerSeeder
-import lk.voltgo.voltgo.data.local.seeders.OperatorUserSeeder
 import lk.voltgo.voltgo.data.local.seeders.UserSeeder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +18,6 @@ import lk.voltgo.voltgo.data.local.seeders.ReservationSeeder
     entities = [
         UserEntity::class,
         EVOwnerEntity::class,
-        OperatorUserEntity::class,
         ReservationEntity::class
     ],
     version = 1,
@@ -29,7 +27,6 @@ abstract class VoltGoDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
     abstract fun evOwnerDao(): EVOwnerDao
-    abstract fun operatorUserDao(): OperatorUserDao
     abstract fun reservationDao(): ReservationDao
 
 
@@ -58,7 +55,6 @@ abstract class VoltGoDatabase : RoomDatabase() {
                                 // Seed in a defined order so FKs are satisfied
                                 UserSeeder.seed(createdInstance.userDao())
                                 EVOwnerSeeder.seed(createdInstance.evOwnerDao())
-                                OperatorUserSeeder.seed(createdInstance.operatorUserDao())
                                 ReservationSeeder.seed(createdInstance.reservationDao())
                             }
                         }

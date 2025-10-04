@@ -7,16 +7,11 @@ import androidx.room.PrimaryKey;
 
 @Entity(
         tableName = "user",
-        indices = [Index(value = ["nic"], unique = true)]
 )
 data class UserEntity(
         @PrimaryKey
         @ColumnInfo(name = "user_id")
         val userId: String,
-
-        //Remove
-        @ColumnInfo(name = "nic")
-        val nic: String,
 
         @ColumnInfo(name = "display_name")
         val displayName: String,
