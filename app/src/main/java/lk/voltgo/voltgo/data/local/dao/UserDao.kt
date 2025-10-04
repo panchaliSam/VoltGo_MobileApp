@@ -12,9 +12,6 @@ interface UserDao {
     @Query("SELECT * FROM user WHERE user_id = :userId")
     suspend fun getUserById(userId: String): UserEntity?
 
-    @Query("SELECT * FROM user WHERE nic = :nic")
-    suspend fun getUserByNic(nic: String): UserEntity?
-
     @Query("SELECT * FROM user WHERE email = :email")
     suspend fun getUserByEmail(email: String): UserEntity?
 
