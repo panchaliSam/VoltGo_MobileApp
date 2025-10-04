@@ -12,13 +12,18 @@ import lk.voltgo.voltgo.data.local.seeders.UserSeeder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import lk.voltgo.voltgo.data.local.seeders.ChargingStationSeeder
 import lk.voltgo.voltgo.data.local.seeders.ReservationSeeder
+import lk.voltgo.voltgo.data.local.seeders.SlotSeeder
 
 @Database(
     entities = [
         UserEntity::class,
         EVOwnerEntity::class,
-        ReservationEntity::class
+        OperatorUserEntity::class,
+        ReservationEntity::class,
+        ChargingStationEntity::class,
+        SlotEntity::class
     ],
     version = 1,
     exportSchema = false
@@ -28,7 +33,8 @@ abstract class VoltGoDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun evOwnerDao(): EVOwnerDao
     abstract fun reservationDao(): ReservationDao
-
+    abstract fun chargingStationDao(): ChargingStationDao
+    abstract fun slotDao(): SlotDao
 
     companion object {
         const val DATABASE_NAME = "voltgo_database"
@@ -56,6 +62,8 @@ abstract class VoltGoDatabase : RoomDatabase() {
                                 UserSeeder.seed(createdInstance.userDao())
                                 EVOwnerSeeder.seed(createdInstance.evOwnerDao())
                                 ReservationSeeder.seed(createdInstance.reservationDao())
+                                ChargingStationSeeder.seed(createdInstance.chargingStationDao())
+                                SlotSeeder.seed( createdInstance.slotDao())
                             }
                         }
                     })
