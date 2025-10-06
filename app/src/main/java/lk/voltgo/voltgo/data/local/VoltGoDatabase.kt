@@ -1,6 +1,8 @@
 package lk.voltgo.voltgo.data.local
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -20,12 +22,11 @@ import lk.voltgo.voltgo.data.local.seeders.SlotSeeder
     entities = [
         UserEntity::class,
         EVOwnerEntity::class,
-        //OperatorUserEntity::class,
         ReservationEntity::class,
         ChargingStationEntity::class,
         SlotEntity::class
     ],
-    version = 1,
+    version = 1,                 // keep as 1 since fallbackToDestructiveMigration is enabled
     exportSchema = false
 )
 abstract class VoltGoDatabase : RoomDatabase() {
@@ -36,6 +37,7 @@ abstract class VoltGoDatabase : RoomDatabase() {
     abstract fun chargingStationDao(): ChargingStationDao
     abstract fun slotDao(): SlotDao
 
+
     companion object {
         const val DATABASE_NAME = "voltgo_database"
 
@@ -44,7 +46,6 @@ abstract class VoltGoDatabase : RoomDatabase() {
 
         fun getDatabase(context: Context): VoltGoDatabase {
             return INSTANCE ?: synchronized(this) {
-                // Create the DB instance variable first so the callback can capture it.
                 lateinit var createdInstance: VoltGoDatabase
 
                 createdInstance = Room.databaseBuilder(
@@ -52,13 +53,14 @@ abstract class VoltGoDatabase : RoomDatabase() {
                     VoltGoDatabase::class.java,
                     DATABASE_NAME
                 )
+                    // NOTE: destructive migration wipes data on schema change; fine for dev/demo.
                     .fallbackToDestructiveMigration()
                     .addCallback(object : RoomDatabase.Callback() {
+                        @RequiresApi(Build.VERSION_CODES.O)
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
-                            // Use the already-built instance captured above
                             CoroutineScope(Dispatchers.IO).launch {
-                                // Seed in a defined order so FKs are satisfied
+                                // Seed in order (FK safety)
                                 UserSeeder.seed(createdInstance.userDao())
                                 EVOwnerSeeder.seed(createdInstance.evOwnerDao())
                                 ReservationSeeder.seed(createdInstance.reservationDao())

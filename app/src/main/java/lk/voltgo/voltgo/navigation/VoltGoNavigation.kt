@@ -6,9 +6,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import lk.chargehere.app.navigation.NavigationGraph
-import lk.chargehere.app.navigation.Screen
-import lk.chargehere.app.ui.screens.auth.*
+import lk.voltGo.app.navigation.NavigationGraph
+import lk.voltGo.app.navigation.Screen
+import lk.voltGo.app.ui.screens.auth.*
 
 @Composable
 fun VoltGoNavigation(
@@ -57,8 +57,8 @@ fun VoltGoNavigation(
             }
             composable(Screen.Register.route) {
                 RegisterScreen(
-                    onRegisterComplete = {
-                        navController.navigate(NavigationGraph.Main.route) {
+                    onRegister = {
+                        navController.navigate(NavigationGraph.Auth.route) {
                             popUpTo(NavigationGraph.Auth.route) { inclusive = true }
                             launchSingleTop = true
                         }

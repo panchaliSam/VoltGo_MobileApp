@@ -1,4 +1,4 @@
-package lk.chargehere.app.ui.theme
+package lk.voltgo.voltgo.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

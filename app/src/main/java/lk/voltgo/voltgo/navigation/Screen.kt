@@ -1,4 +1,4 @@
-package lk.chargehere.app.navigation
+package lk.voltGo.app.navigation
 
 sealed class Screen(val route: String) {
     // Authentication Flow

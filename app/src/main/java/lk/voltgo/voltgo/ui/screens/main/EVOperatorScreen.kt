@@ -17,7 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.platform.LocalContext
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
-import lk.chargehere.app.ui.theme.AppColors
+import lk.voltgo.voltgo.ui.theme.AppColors
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
