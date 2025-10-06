@@ -22,7 +22,6 @@ import lk.voltgo.voltgo.data.local.seeders.SlotSeeder
     entities = [
         UserEntity::class,
         EVOwnerEntity::class,
-        OperatorUserEntity::class,
         ReservationEntity::class,
         ChargingStationEntity::class,
         SlotEntity::class
