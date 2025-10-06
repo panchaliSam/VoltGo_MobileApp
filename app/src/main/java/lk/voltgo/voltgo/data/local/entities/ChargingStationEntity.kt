@@ -26,6 +26,12 @@ data class ChargingStationEntity(
     @ColumnInfo(name = "is_active")
     val isActive: Boolean,
 
+    @ColumnInfo(name = "latitude")
+    val latitude: Double,
+
+    @ColumnInfo(name = "longitude")
+    val longitude: Double,
+
     )
 
 

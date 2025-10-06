@@ -15,26 +15,32 @@ object ChargingStationSeeder {
                     location = "Colombo - Main Street",
                     type = "AC",
                     availableSlots = 4,
-                    isActive = true
+                    isActive = true,
+                    latitude = 6.9271,
+                    longitude = 79.8612
                 ),
                 ChargingStationEntity(
                     id = "ST002",
                     location = "Kandy - City Center",
                     type = "DC",
                     availableSlots = 2,
-                    isActive = true
+                    isActive = true,
+                    latitude = 7.2906,
+                    longitude = 80.6337
                 ),
                 ChargingStationEntity(
                     id = "ST003",
                     location = "Galle - Marine Drive",
                     type = "AC",
                     availableSlots = 3,
-                    isActive = false // inactive for testing
+                    isActive = false,
+                    latitude = 6.0535,
+                    longitude = 80.2210
                 )
             )
 
             try {
-                chargingStationDao.insertAll(demoStations)
+                chargingStationDao.insertStations(demoStations)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
