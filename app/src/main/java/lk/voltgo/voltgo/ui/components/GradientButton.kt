@@ -16,13 +16,15 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import lk.chargehere.app.ui.theme.AppColors
+import lk.voltgo.voltgo.ui.theme.AppColors
 
 @Composable
 fun GradientButton(
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    loading: Boolean = false,
 ) {
     Button(
         onClick = onClick,

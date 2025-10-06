@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import lk.chargehere.app.ui.theme.AppColors
+import lk.voltgo.voltgo.ui.theme.AppColors
 import java.time.LocalDate
 import java.time.LocalTime
 

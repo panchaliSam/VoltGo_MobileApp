@@ -1,4 +1,4 @@
-package lk.chargehere.app.ui.screens.auth
+package lk.voltGo.app.ui.screens.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,13 +13,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.delay
-import lk.chargehere.app.ui.theme.AppColors
+import lk.voltgo.voltgo.ui.theme.AppColors
 import lk.voltgo.voltgo.ui.screens.auth.SplashViewModel
 
 @Composable

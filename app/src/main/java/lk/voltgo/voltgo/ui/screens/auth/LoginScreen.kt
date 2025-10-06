@@ -1,4 +1,4 @@
-package lk.chargehere.app.ui.screens.auth
+package lk.voltGo.app.ui.screens.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -12,7 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import lk.chargehere.app.ui.theme.AppColors
+import lk.voltgo.voltgo.ui.theme.AppColors
 import lk.voltgo.voltgo.ui.components.GradientButton
 
 import androidx.compose.foundation.rememberScrollState
@@ -28,15 +28,21 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.hilt.navigation.compose.hiltViewModel
+import lk.voltgo.voltgo.ui.screens.auth.LoginNavigationEvent
+import lk.voltgo.voltgo.ui.screens.auth.LoginViewModel
 
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
-    onNavigateToRegister: () -> Unit
+    onNavigateToRegister: () -> Unit,
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+
+    val uiState by viewModel.uiState.collectAsState()
 
     Box(
         modifier = Modifier
@@ -124,12 +130,32 @@ fun LoginScreen(
 
             // Primary action
             GradientButton(
-                text = "Login",
-                onClick = onLoginSuccess,
+                text = if (uiState.isLoading) "Loading..." else "Login",
+                onClick = { viewModel.loginUser(username = email, password = password) },
+                enabled = !uiState.isLoading,
+                loading = uiState.isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp)
             )
+
+            LaunchedEffect(uiState.navigationEvent) {
+                when (val event = uiState.navigationEvent) {
+                    is LoginNavigationEvent.NavigateToRegister -> {
+                        onNavigateToRegister()
+                        viewModel.onNavigationHandled()
+                    }
+                    is LoginNavigationEvent.NavigateToMain -> {
+                        onLoginSuccess() // Navigate to main screen for EVOwner
+                        viewModel.onNavigationHandled()
+                    }
+                    is LoginNavigationEvent.NavigateToOperator -> {
+                        // Handle operator navigation if needed
+                        viewModel.onNavigationHandled()
+                    }
+                    null -> {}
+                }
+            }
 
             Spacer(Modifier.height(24.dp))
         }
