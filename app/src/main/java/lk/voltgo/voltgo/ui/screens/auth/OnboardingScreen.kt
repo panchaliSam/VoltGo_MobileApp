@@ -1,4 +1,4 @@
-package lk.chargehere.app.ui.screens.auth
+package lk.voltGo.app.ui.screens.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -16,7 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
-import lk.chargehere.app.ui.theme.AppColors
+import lk.voltgo.voltgo.ui.theme.AppColors
 import kotlinx.coroutines.launch
 
 import androidx.compose.foundation.rememberScrollState
@@ -25,7 +25,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.EvStation
 import androidx.compose.material3.Icon
-import lk.voltgo.voltgo.ui.components.GradientButton
 
 data class OnboardPage(val title: String, val desc: String)
 
