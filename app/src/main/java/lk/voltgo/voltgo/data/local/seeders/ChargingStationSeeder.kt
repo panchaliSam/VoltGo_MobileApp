@@ -12,30 +12,33 @@ object ChargingStationSeeder {
             val demoStations = listOf(
                 ChargingStationEntity(
                     id = "ST001",
-                    location = "Colombo - Main Street",
+                    name = "Colombo Main Station",
                     type = "AC",
-                    availableSlots = 4,
-                    isActive = true,
+                    location = "Colombo - Main Street",
                     latitude = 6.9271,
-                    longitude = 79.8612
+                    longitude = 79.8612,
+                    availableSlots = 4,
+                    isActive = true
                 ),
                 ChargingStationEntity(
                     id = "ST002",
-                    location = "Kandy - City Center",
+                    name = "Kandy City Station",
                     type = "DC",
-                    availableSlots = 2,
-                    isActive = true,
+                    location = "Kandy - City Center",
                     latitude = 7.2906,
-                    longitude = 80.6337
+                    longitude = 80.6337,
+                    availableSlots = 2,
+                    isActive = true
                 ),
                 ChargingStationEntity(
                     id = "ST003",
-                    location = "Galle - Marine Drive",
+                    name = "Galle Marine Station",
                     type = "AC",
-                    availableSlots = 3,
-                    isActive = false,
+                    location = "Galle - Marine Drive",
                     latitude = 6.0535,
-                    longitude = 80.2210
+                    longitude = 80.2210,
+                    availableSlots = 3,
+                    isActive = false
                 )
             )
 

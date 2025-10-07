@@ -64,8 +64,8 @@ dependencies {
     implementation("com.google.maps.android:maps-compose:2.11.2")
     implementation("com.google.android.gms:play-services-maps:18.1.0")
 
-    // ZXing Android Embedded
-    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+//    // ZXing Android Embedded
+//    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
