@@ -1,4 +1,4 @@
-package lk.voltGo.app.navigation
+package lk.voltgo.voltgo.navigation
 
 sealed class Screen(val route: String) {
     // Authentication Flow
@@ -8,7 +8,8 @@ sealed class Screen(val route: String) {
     data object Register : Screen("register")
 
     // Main Flow - EV Owner
-
+    data object Home : Screen("home")
+    data object MyReservations : Screen("my_reservations")
 
     // Operator Flow
 

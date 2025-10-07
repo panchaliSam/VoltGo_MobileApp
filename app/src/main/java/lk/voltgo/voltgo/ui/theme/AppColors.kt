@@ -24,4 +24,22 @@ object AppColors {
     val TranslucentWhite85 = Color.White.copy(alpha = 0.85f)
     val TranslucentWhite90 = Color.White.copy(alpha = 0.9f)
     val TranslucentWhite20 = Color.White.copy(alpha = 0.2f)
+
+    /* ---------- Tag-specific palette (unique codes) ---------- */
+    // Confirmed
+    val TagConfirmedBg = Color(0xFF0BF50F)      // same hue as BrandGreen but locked for tags
+    val TagConfirmedText = DeepNavy
+
+    // Pending
+    val TagPendingBg = Color(0xFFFFDF21)        // same hue as EnergyAmber but locked for tags
+    val TagPendingText = DeepNavy
+
+    // Completed
+    val TagCompletedBg = Color(0xFFFF4545)      // same hue as Teal but locked for tags
+    val TagCompletedText = BrandWhite
+
+    // Cancelled (neutral, readable on white)
+    val TagCancelledBg = Color(0xFFE5E7EB)      // light neutral (slate-200-ish)
+    val TagCancelledText = DeepNavy
+    val TagCancelledBorder = Color(0xFFCBD5E1)  // subtle border (slate-300-ish)
 }
