@@ -62,3 +62,27 @@ data class LoginRequest(
 data class MessageResponse(
     val message: String
 )
+
+// User Profile response
+data class UserProfileResponse(
+    val id: String,
+    val email: String,
+    val username: String?,
+    val phone: String,
+    val password: String?,
+    val role: String,
+    val isActive: Boolean,
+    val nic: String,
+    val fullName: String,
+    val address: String,
+    val createdAt: String,
+    val lastLoginAt: String
+)
+
+data class UpdateProfileRequest(
+    val email: String,
+    val phone: String,
+    val password: String,
+    val role: String,
+    val isActive: Boolean
+)
