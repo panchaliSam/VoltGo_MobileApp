@@ -22,7 +22,9 @@ sealed class LoginNavigationEvent {
         val email: String,
         val displayName: String
     ) : LoginNavigationEvent()
-    data object NavigateToMain : LoginNavigationEvent()
+    data class NavigateToMain(
+        val token: String
+    ) : LoginNavigationEvent()
     data object NavigateToOperator : LoginNavigationEvent()
 }
 
@@ -46,10 +48,8 @@ class LoginViewModel @Inject constructor(
                     result.isSuccess -> {
                         val response = result.getOrNull()
                         when (response?.role?.lowercase()) {
-                            "evowner" -> _uiState.value = LoginUiState(navigationEvent = LoginNavigationEvent.NavigateToRegister(
-                                token = response.token,
-                                email = response.role,
-                                displayName = response.role,
+                            "evowner" -> _uiState.value = LoginUiState(navigationEvent = LoginNavigationEvent.NavigateToMain(
+                                token = response.token
                             ))
                             "operator" -> _uiState.value = LoginUiState(navigationEvent = LoginNavigationEvent.NavigateToOperator)
                             else -> _uiState.value = LoginUiState(errorMessage = "Invalid role")

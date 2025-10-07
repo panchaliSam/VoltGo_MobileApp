@@ -1,4 +1,4 @@
-package lk.voltGo.app.ui.screens.auth
+package lk.voltgo.voltgo.ui.screens.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
