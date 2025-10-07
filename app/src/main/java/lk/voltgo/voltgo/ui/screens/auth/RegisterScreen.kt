@@ -1,4 +1,4 @@
-package lk.voltGo.app.ui.screens.auth
+package lk.voltgo.voltgo.ui.screens.auth
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background

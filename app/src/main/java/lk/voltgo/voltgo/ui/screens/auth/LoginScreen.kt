@@ -1,4 +1,4 @@
-package lk.voltGo.app.ui.screens.auth
+package lk.voltgo.voltgo.ui.screens.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -34,7 +34,7 @@ import lk.voltgo.voltgo.ui.screens.auth.LoginViewModel
 
 @Composable
 fun LoginScreen(
-    onLoginSuccess: () -> Unit,
+    onLoginSuccess: (String) -> Unit,
     onNavigateToRegister: () -> Unit,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
@@ -146,7 +146,7 @@ fun LoginScreen(
                         viewModel.onNavigationHandled()
                     }
                     is LoginNavigationEvent.NavigateToMain -> {
-                        onLoginSuccess() // Navigate to main screen for EVOwner
+                        onLoginSuccess(event.token) // Navigate to main screen for EVOwner
                         viewModel.onNavigationHandled()
                     }
                     is LoginNavigationEvent.NavigateToOperator -> {
@@ -165,5 +165,8 @@ fun LoginScreen(
 @Preview(showBackground = true)
 @Composable
 private fun LoginPreview() {
-    LoginScreen(onLoginSuccess = {}, onNavigateToRegister = {})
+    LoginScreen(
+        onLoginSuccess = { _ -> },
+        onNavigateToRegister = {}
+    )
 }

@@ -15,8 +15,8 @@ import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import lk.voltGo.app.navigation.NavigationGraph
 import lk.voltgo.voltgo.data.local.VoltGoDatabase
+import lk.voltgo.voltgo.navigation.NavigationGraph
 import lk.voltgo.voltgo.navigation.VoltGoNavigation
 
 @AndroidEntryPoint
