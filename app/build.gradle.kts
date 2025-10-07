@@ -95,6 +95,10 @@ dependencies {
     // Security
     implementation(libs.androidx.security.crypto)
 
+    // Data Store
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore.core)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
