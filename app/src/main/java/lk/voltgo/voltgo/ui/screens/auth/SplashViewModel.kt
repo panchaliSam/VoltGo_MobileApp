@@ -9,7 +9,7 @@ import javax.inject.Inject
 class SplashViewModel @Inject constructor(
     private val authManager: AuthManager
 ) : ViewModel(){
-    fun checkAuthStatus(
+    suspend fun checkAuthStatus(
         onNavigateToOnboarding: () -> Unit,
     ) {
         if (authManager.isLoggedIn()) {

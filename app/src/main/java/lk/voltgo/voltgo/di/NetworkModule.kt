@@ -1,5 +1,6 @@
 package lk.voltgo.voltgo.di
 
+import kotlinx.coroutines.runBlocking
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,7 +25,7 @@ object NetworkModule {
     fun provideAuthInterceptor(tokenManager: TokenManager): Interceptor {
         return Interceptor { chain ->
             val originalRequest = chain.request()
-            val token = tokenManager.getAccessToken()
+            val token = runBlocking { tokenManager.getToken() }
 
             val newRequest = if (token != null) {
                 originalRequest.newBuilder()

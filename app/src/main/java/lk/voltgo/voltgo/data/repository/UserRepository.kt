@@ -6,6 +6,8 @@ import lk.voltgo.voltgo.data.remote.api.AuthApiService
 import lk.voltgo.voltgo.data.remote.dto.AuthResponse
 import lk.voltgo.voltgo.data.remote.dto.LoginRequest
 import lk.voltgo.voltgo.data.remote.dto.RegisterRequest
+import lk.voltgo.voltgo.data.remote.dto.UpdateProfileRequest
+import lk.voltgo.voltgo.data.remote.dto.UserProfileResponse
 import lk.voltgo.voltgo.domain.model.User
 import lk.voltgo.voltgo.domain.model.toDomain
 import java.util.UUID
@@ -83,6 +85,34 @@ class UserRepository @Inject constructor(
         } catch (e: Exception) {
             Result.failure(Exception("Network error: ${e.localizedMessage}"))
         }
+    }
+
+    suspend fun getProfile(token: String): Result<UserProfileResponse> {
+        return try {
+            val response = authApiService.getProfile("Bearer $token")
+            if (response.isSuccessful) {
+                response.body()?.let { Result.success(it) }
+                    ?: Result.failure(Exception("Empty response body"))
+            } else {
+                Result.failure(Exception("Error: ${response.code()} ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateProfile(
+        token: String,
+        req: UpdateProfileRequest
+    ): Result<Unit> = try {
+        val response = authApiService.updateProfile(
+            authHeader = "Bearer $token",
+            request = req
+        )
+        if (response.isSuccessful) Result.success(Unit)
+        else Result.failure(Exception("Update failed: ${response.code()} ${response.message()}"))
+    } catch (e: Exception) {
+        Result.failure(e)
     }
 
 }

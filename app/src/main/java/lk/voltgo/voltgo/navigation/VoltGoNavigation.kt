@@ -10,6 +10,7 @@ import lk.voltgo.voltgo.ui.screens.auth.LoginScreen
 import lk.voltgo.voltgo.ui.screens.auth.OnboardingScreen
 import lk.voltgo.voltgo.ui.screens.auth.RegisterScreen
 import lk.voltgo.voltgo.ui.screens.auth.SplashScreen
+import lk.voltgo.voltgo.ui.screens.auth.EditProfileScreen
 import lk.voltgo.voltgo.ui.screens.main.HomeScreen
 import lk.voltgo.voltgo.ui.screens.main.MyReservationsScreen
 
@@ -87,8 +88,7 @@ fun VoltGoNavigation(
                         // navController.navigate(Screen.FindStations.route)
                     },
                     onEditProfileClick = {
-                        // TODO: nav to profile/edit screen
-                        // navController.navigate(Screen.Profile.route)
+                        navController.navigate(Screen.Profile.route)
                     },
                     onLogoutClick = {
                         navController.navigate(NavigationGraph.Auth.route) {
@@ -108,6 +108,11 @@ fun VoltGoNavigation(
                     onCancelReservation = { _ ->
                         // TODO: Handle cancel flow or navigate to a confirmation dialog/screen
                     }
+                )
+            }
+            composable(Screen.Profile.route) {
+                EditProfileScreen(
+                    onBack = { navController.popBackStack() }
                 )
             }
         }
