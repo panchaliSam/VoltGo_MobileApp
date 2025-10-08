@@ -12,29 +12,38 @@ object ChargingStationSeeder {
             val demoStations = listOf(
                 ChargingStationEntity(
                     id = "ST001",
-                    location = "Colombo - Main Street",
+                    name = "Colombo Main Station",
                     type = "AC",
+                    location = "Colombo - Main Street",
+                    latitude = 6.9271,
+                    longitude = 79.8612,
                     availableSlots = 4,
                     isActive = true
                 ),
                 ChargingStationEntity(
                     id = "ST002",
-                    location = "Kandy - City Center",
+                    name = "Kandy City Station",
                     type = "DC",
+                    location = "Kandy - City Center",
+                    latitude = 7.2906,
+                    longitude = 80.6337,
                     availableSlots = 2,
                     isActive = true
                 ),
                 ChargingStationEntity(
                     id = "ST003",
-                    location = "Galle - Marine Drive",
+                    name = "Galle Marine Station",
                     type = "AC",
+                    location = "Galle - Marine Drive",
+                    latitude = 6.0535,
+                    longitude = 80.2210,
                     availableSlots = 3,
-                    isActive = false // inactive for testing
+                    isActive = false
                 )
             )
 
             try {
-                chargingStationDao.insertAll(demoStations)
+                chargingStationDao.insertStations(demoStations)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
