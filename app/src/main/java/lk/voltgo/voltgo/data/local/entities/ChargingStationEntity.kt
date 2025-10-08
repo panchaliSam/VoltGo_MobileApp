@@ -14,11 +14,20 @@ data class ChargingStationEntity(
     @ColumnInfo(name = "id")
     val id: String,
 
-    @ColumnInfo(name = "location")
-    val location: String,
+    @ColumnInfo(name = "name")
+    val name: String,
 
     @ColumnInfo(name = "type")
     val type: String,
+
+    @ColumnInfo(name = "location")
+    val location: String,
+
+    @ColumnInfo(name = "latitude")
+    val latitude: Double,
+
+    @ColumnInfo(name = "longitude")
+    val longitude: Double,
 
     @ColumnInfo(name = "available_slots")
     val availableSlots: Int,

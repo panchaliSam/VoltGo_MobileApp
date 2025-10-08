@@ -17,7 +17,11 @@ interface ChargingStationDao {
 
     // Get a single station by ID
     @Query("SELECT * FROM charging_station WHERE id = :id LIMIT 1")
-    suspend fun getStationById(id: Int): ChargingStationEntity?
+    suspend fun getStationById(id: String): ChargingStationEntity?
+
+    // Search stations by name or location
+    @Query("SELECT * FROM charging_station WHERE name LIKE :query OR location LIKE :query")
+    suspend fun searchStations(query: String): List<ChargingStationEntity>
 
     // Insert a station
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -36,6 +40,6 @@ interface ChargingStationDao {
     suspend fun deleteStation(station: ChargingStationEntity)
 
     @Insert
-    fun insertAll(demoStations: kotlin.collections.List<lk.voltgo.voltgo.data.local.entities.ChargingStationEntity>)
+    fun insertAll(demoStations: List<ChargingStationEntity>)
 }
 
