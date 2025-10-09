@@ -134,7 +134,7 @@ private fun EmptyState() {
 }
 
 @Composable
-private fun StatusChip(status: ReservationStatus, shape: Shape = CircleShape) {
+fun StatusChip(status: ReservationStatus, shape: Shape = CircleShape) {
     // map to unique tag colors
     val (bg, text, border) = when (status) {
         ReservationStatus.Confirmed -> Triple(AppColors.TagConfirmedBg, AppColors.TagConfirmedText, null)

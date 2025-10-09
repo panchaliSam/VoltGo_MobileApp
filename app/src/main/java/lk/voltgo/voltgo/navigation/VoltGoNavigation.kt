@@ -11,6 +11,8 @@ import lk.voltgo.voltgo.ui.screens.auth.OnboardingScreen
 import lk.voltgo.voltgo.ui.screens.auth.RegisterScreen
 import lk.voltgo.voltgo.ui.screens.auth.SplashScreen
 import lk.voltgo.voltgo.ui.screens.auth.EditProfileScreen
+import lk.voltgo.voltgo.ui.screens.main.CreateReservationScreen
+import lk.voltgo.voltgo.ui.screens.main.StationsScreen
 import lk.voltgo.voltgo.ui.screens.main.HomeScreen
 import lk.voltgo.voltgo.ui.screens.main.MyReservationsScreen
 
@@ -83,9 +85,11 @@ fun VoltGoNavigation(
                     onMyReservationsClick = {
                         navController.navigate(Screen.MyReservations.route)
                     },
+                    onNewReservationClick = {
+                        navController.navigate(Screen.NewReservation.route)
+                    },
                     onFindStationsClick = {
-                        // TODO: nav to map/find stations screen
-                        // navController.navigate(Screen.FindStations.route)
+                        navController.navigate(Screen.Stations.route)
                     },
                     onEditProfileClick = {
                         navController.navigate(Screen.Profile.route)
@@ -108,6 +112,20 @@ fun VoltGoNavigation(
                     onCancelReservation = { _ ->
                         // TODO: Handle cancel flow or navigate to a confirmation dialog/screen
                     }
+                )
+            }
+            composable(Screen.NewReservation.route) {
+                CreateReservationScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onOpenMap = { navController.popBackStack() },
+                    onSubmit = { _ ->
+                        // TODO: Handle cancel flow or navigate to a confirmation dialog/screen
+                    }
+                )
+            }
+            composable(Screen.Stations.route) {
+                StationsScreen(
+                    onBackClick = { navController.popBackStack() },
                 )
             }
             composable(Screen.Profile.route) {

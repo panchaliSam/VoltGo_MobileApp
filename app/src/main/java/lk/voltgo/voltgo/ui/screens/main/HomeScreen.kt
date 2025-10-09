@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Bookmarks
 import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,6 +23,7 @@ import lk.voltgo.voltgo.ui.theme.AppColors
 @Composable
 fun HomeScreen(
     onMyReservationsClick: () -> Unit,
+    onNewReservationClick: () -> Unit,
     onFindStationsClick: () -> Unit,
     onEditProfileClick: () -> Unit,
     onLogoutClick: () -> Unit,
@@ -104,6 +106,14 @@ fun HomeScreen(
             )
 
             GradientActionCard(
+                title = "Create Reservation",
+                subtitle = "Book a charging slot now",
+                icon = Icons.Filled.Edit,
+                onClick = onNewReservationClick,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            GradientActionCard(
                 title = "Find Stations",
                 subtitle = "Discover nearby chargers & availability",
                 icon = Icons.Filled.Map,
@@ -112,13 +122,7 @@ fun HomeScreen(
             )
 
             // Add more actions later if needed...
-            Spacer(Modifier.height(8.dp))
-
-            // Optional tip/secondary actions section
-            AssistChipRow(
-                onFindStationsClick = onFindStationsClick,
-                onMyReservationsClick = onMyReservationsClick
-            )
+            // Add more actions later if needed...
         }
     }
 }
@@ -134,12 +138,8 @@ private fun AssistChipRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         AssistChip(
-            onClick = onFindStationsClick,
-            label = { Text("Nearest chargers") }
-        )
-        AssistChip(
             onClick = onMyReservationsClick,
-            label = { Text("Upcoming reservations") }
+            label = { Text("Create Reservation") }
         )
     }
 }
@@ -149,6 +149,7 @@ private fun AssistChipRow(
 private fun HomeScreenPreview() {
     HomeScreen(
         onMyReservationsClick = {},
+        onNewReservationClick = {},
         onFindStationsClick = {},
         onEditProfileClick = {},
         onLogoutClick = {}
