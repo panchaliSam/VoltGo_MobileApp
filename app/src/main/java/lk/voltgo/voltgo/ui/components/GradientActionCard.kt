@@ -1,3 +1,16 @@
+/**
+ * ------------------------------------------------------------
+ * File: GradientActionCard.kt
+ * Author: Panchali Samarasinghe
+ * Date: 2025-10-10
+ *
+ * Description:
+ * This composable component displays a gradient-styled action card with a title, optional subtitle,
+ * and an optional icon. It supports click handling and customizable gradient backgrounds, designed
+ * for interactive actions or navigation in the VoltGo app UI.
+ * ------------------------------------------------------------
+ */
+
 package lk.voltgo.voltgo.ui.components
 
 import androidx.compose.foundation.background
@@ -20,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import lk.voltgo.voltgo.ui.theme.AppColors
 
+// Composable function that creates a clickable gradient card with title, subtitle, and optional icon.
 @Composable
 fun GradientActionCard(
     title: String,

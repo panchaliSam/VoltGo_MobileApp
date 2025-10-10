@@ -1,3 +1,17 @@
+/**
+ * ---------------------------------------------------------
+ * File: RegisterScreen.kt
+ * Project: VoltGo ⚡ Mobile App
+ * Description:
+ *   Provides the registration UI screen where users can create a new account.
+ *   Handles form validation, input fields, password visibility, and navigation
+ *   between registration, login, and main screens.
+ *
+ * Author: Panchali Samarasinghe
+ * Created: October 10, 2025
+ * Version: 1.0
+ * ---------------------------------------------------------
+ */
 package lk.voltgo.voltgo.ui.screens.auth
 
 import android.annotation.SuppressLint
@@ -40,6 +54,7 @@ data class RegisterRequest(
     val address: String
 )
 
+// Main registration screen composable handling user input, validation, and navigation
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun RegisterScreen(
@@ -317,6 +332,7 @@ fun RegisterScreen(
     }
 }
 
+// Displays a preview of the registration screen in Android Studio design view
 @Preview(showBackground = true)
 @Composable
 private fun RegisterPreview() {
@@ -325,6 +341,7 @@ private fun RegisterPreview() {
 
 /* ------- Optional: Backward-compatible wrapper (keeps your old onRegister signature) ------- */
 
+// Backward-compatible wrapper for legacy usage of the registration screen
 @Composable
 fun RegisterScreen(
     onRegister: (RegisterRequest) -> Unit,

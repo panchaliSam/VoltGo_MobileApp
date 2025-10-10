@@ -1,3 +1,19 @@
+/**
+ * ------------------------------------------------------------
+ * File: MyReservationsScreen.kt
+ * Author: Panchali Samarasinghe
+ * Created: October 10, 2025
+ * Version: 1.0
+ *
+ * Description:
+ * This file defines the My Reservations screen of the VoltGo app.
+ * It displays a list of the user's EV charging reservations, including
+ * details like station name, date/time, and reservation status. Users
+ * can view details, cancel confirmed or pending reservations, and see
+ * completed or cancelled ones in a well-structured UI.
+ * ------------------------------------------------------------
+ */
+
 package lk.voltgo.voltgo.ui.screens.main
 
 import androidx.compose.foundation.BorderStroke
@@ -26,6 +42,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import lk.voltgo.voltgo.ui.theme.AppColors
 
+// Main composable for displaying all user reservations.
+// Handles the list, empty state, and top app bar navigation.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyReservationsScreen(
@@ -99,6 +117,7 @@ fun MyReservationsScreen(
 
 /* ---------- Data & UI helpers ---------- */
 
+// Data model representing a single reservation’s details.
 data class ReservationUi(
     val id: String,
     val station: String,
@@ -107,8 +126,10 @@ data class ReservationUi(
     val status: ReservationStatus
 )
 
+// Enum representing all possible reservation states.
 enum class ReservationStatus { Confirmed, Pending, Completed, Cancelled }
 
+// Displays a friendly message when no reservations are available.
 @Composable
 private fun EmptyState() {
     Column(
@@ -133,6 +154,7 @@ private fun EmptyState() {
     }
 }
 
+// Displays a small colored chip indicating the reservation status.
 @Composable
 fun StatusChip(status: ReservationStatus, shape: Shape = CircleShape) {
     // map to unique tag colors
@@ -163,6 +185,7 @@ fun StatusChip(status: ReservationStatus, shape: Shape = CircleShape) {
 }
 
 
+// Represents a single reservation item with actions (view, cancel).
 @Composable
 private fun ReservationCard(
     res: ReservationUi,
@@ -261,6 +284,8 @@ private fun ReservationCard(
 }
 
 /* ---------- Preview ---------- */
+
+// Preview function for visualizing the MyReservationsScreen in Android Studio.
 @Preview(showBackground = true, widthDp = 420)
 @Composable
 private fun MyReservationsScreenPreview() {

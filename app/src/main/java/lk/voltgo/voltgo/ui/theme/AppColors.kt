@@ -1,31 +1,43 @@
+/**
+ * ------------------------------------------------------------
+ * File: AppColors.kt
+ * Author: Panchali Samarasinghe
+ * Date: 2025-10-10
+ *
+ * Description:
+ * Defines all custom color constants and gradient schemes used
+ * throughout the VoltGo app. This centralizes the color palette
+ * for consistent theming and visual identity.
+ * ------------------------------------------------------------
+ */
 package lk.voltgo.voltgo.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
 object AppColors {
-    // Primary brand colors
+    // Define the main brand color palette (core identity colors)
     val DeepNavy = Color(0xFF0B1026)
     val ElectricBlue = Color(0xFF1E40AF)
     val Teal = Color(0xFF0EA5A4)
 
-    // Accent colors
+    // Define the accent colors that complement the primary palette
     val BrandGreen = Color(0xFF0BF50F)
     val BrandBlue = Color(0xFF1E90FF)
     val BrandWhite = Color(0xFFFFFFFF)
     val EnergyAmber = Color(0xFFFFDF21)
 
-    // Gradient combinations
+    // Define gradient lists used in splash screens, buttons, and borders
     val splashGradient = listOf(DeepNavy, ElectricBlue, Teal)
     val buttonGradient = listOf(BrandGreen, BrandBlue, ElectricBlue)
     val logoBorderGradient = listOf(BrandGreen, BrandBlue)
 
-    // Common UI colors with alpha
+    // Define semi-transparent white variants for overlays and backgrounds
     val TranslucentWhite05 = Color.White.copy(alpha = 0.05f)
     val TranslucentWhite85 = Color.White.copy(alpha = 0.85f)
     val TranslucentWhite90 = Color.White.copy(alpha = 0.9f)
     val TranslucentWhite20 = Color.White.copy(alpha = 0.2f)
 
-    /* ---------- Tag-specific palette (unique codes) ---------- */
+    // Define tag-specific background and text colors for status indicators
     // Confirmed
     val TagConfirmedBg = Color(0xFF0BF50F)      // same hue as BrandGreen but locked for tags
     val TagConfirmedText = DeepNavy

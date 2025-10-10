@@ -1,3 +1,17 @@
+/**
+ * ---------------------------------------------------------
+ * File: LoginScreen.kt
+ * Project: VoltGo ⚡ Mobile App
+ * Description:
+ *   Provides the user login screen UI.
+ *   Handles email and password input, login validation, password visibility,
+ *   and navigation to registration or main screens after successful authentication.
+ *
+ * Author: Panchali Samarasinghe
+ * Created: October 10, 2025
+ * Version: 1.0
+ * ---------------------------------------------------------
+ */
 package lk.voltgo.voltgo.ui.screens.auth
 
 import androidx.compose.foundation.background
@@ -32,6 +46,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import lk.voltgo.voltgo.ui.screens.auth.LoginNavigationEvent
 import lk.voltgo.voltgo.ui.screens.auth.LoginViewModel
 
+// Displays the login screen, manages user input, and triggers login logic
 @Composable
 fun LoginScreen(
     onLoginSuccess: (String) -> Unit,
@@ -162,6 +177,7 @@ fun LoginScreen(
     }
 }
 
+// Displays a preview of the login screen for Android Studio design view
 @Preview(showBackground = true)
 @Composable
 private fun LoginPreview() {

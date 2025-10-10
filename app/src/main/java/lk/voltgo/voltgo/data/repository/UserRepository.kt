@@ -1,3 +1,17 @@
+/**
+ * ------------------------------------------------------------
+ * File: UserRepository.kt
+ * Author: Panchali Samarasinghe
+ * Date: 2025-10-10
+ *
+ * Description:
+ * This repository class handles all user-related operations such as
+ * login, registration, profile retrieval, and profile updates.
+ * It communicates with the remote AuthApiService for API calls and
+ * the local UserDao for storing user information locally.
+ * ------------------------------------------------------------
+ */
+
 package lk.voltgo.voltgo.data.repository
 
 import lk.voltgo.voltgo.data.local.dao.UserDao
@@ -19,6 +33,8 @@ class UserRepository @Inject constructor(
     private val authApiService: AuthApiService,
     private val userDao: UserDao
 ){
+    // Handles user login by sending credentials to the backend API.
+    // Returns an AuthResponse object on successful authentication.
     suspend fun login(username: String, password: String): Result<AuthResponse> {
         return try {
             val request = LoginRequest(email = username.trim(), password = password)
@@ -36,6 +52,8 @@ class UserRepository @Inject constructor(
         }
     }
 
+    // Handles user registration by sending registration details to the backend.
+    // On success, saves the user data locally using UserDao and returns the domain model.
     suspend fun register(
         email: String,
         phone: String,
@@ -87,6 +105,7 @@ class UserRepository @Inject constructor(
         }
     }
 
+    // Fetches the currently authenticated user's profile details using the provided token.
     suspend fun getProfile(token: String): Result<UserProfileResponse> {
         return try {
             val response = authApiService.getProfile("Bearer $token")
@@ -101,6 +120,7 @@ class UserRepository @Inject constructor(
         }
     }
 
+    // Updates the authenticated user's profile information on the backend using the provided token and request data.
     suspend fun updateProfile(
         token: String,
         req: UpdateProfileRequest

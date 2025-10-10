@@ -1,8 +1,21 @@
+/**
+ * ------------------------------------------------------------
+ * File: AuthDto.kt
+ * Author: Panchali Samarasinghe
+ * Date: 2025-10-10
+ *
+ * Description:
+ * This file defines all authentication-related data transfer objects (DTOs)
+ * used for communicating with the backend API. It includes models for login,
+ * registration, user profile, and API response handling within the VoltGo app.
+ * ------------------------------------------------------------
+ */
+
 package lk.voltgo.voltgo.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 
-// AuthResponse
+// Represents the response returned from the authentication API after login.
 data class AuthResponse(
     @SerializedName("token")
     val token: String,
@@ -12,7 +25,7 @@ data class AuthResponse(
     val user: UserDto
 )
 
-// User object inside the response
+// Represents the user object included in the AuthResponse.
 data class UserDto(
     @SerializedName("id")
     val id: String,
@@ -32,7 +45,7 @@ data class UserDto(
     val address: String
 )
 
-//Register request
+// Represents the data structure for a user registration request.
 data class RegisterRequest(
     @SerializedName("email")
     val email: String,
@@ -50,7 +63,7 @@ data class RegisterRequest(
     val address: String
 )
 
-// Login request
+// Represents the data structure for a user login request.
 data class LoginRequest(
     @SerializedName("email")
     val email: String,
@@ -58,12 +71,12 @@ data class LoginRequest(
     val password: String
 )
 
-// Register response
+// Represents a simple message-based response from the API, typically after registration.
 data class MessageResponse(
     val message: String
 )
 
-// User Profile response
+// Represents the response structure for fetching a user’s profile details.
 data class UserProfileResponse(
     val id: String,
     val email: String,
@@ -79,6 +92,7 @@ data class UserProfileResponse(
     val lastLoginAt: String
 )
 
+// Represents the request body used when updating a user’s profile information.
 data class UpdateProfileRequest(
     val email: String,
     val phone: String,

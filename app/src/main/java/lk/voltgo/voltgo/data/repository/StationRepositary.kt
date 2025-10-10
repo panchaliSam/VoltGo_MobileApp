@@ -1,3 +1,15 @@
+/**
+ * ------------------------------------------------------------
+ * File: StationRepository.kt
+ * Author: Ishini Aposo
+ * Date: 2025-10-10
+ *
+ * Description:
+ * Repository coordinating charging station data between the remote API and the local
+ * Room database. Exposes cold Flows and suspend functions for use by ViewModels/UI.
+ * Fetches fresh data when possible and keeps the local cache up to date.
+ * ------------------------------------------------------------
+ */
 package lk.voltgo.voltgo.data.repository
 
 import kotlinx.coroutines.flow.Flow
@@ -15,10 +27,7 @@ class StationRepository @Inject constructor(
     private val stationDao: ChargingStationDao
 ) {
 
-    /**
-     * Fetch all stations from API and update local DB.
-     * Returns local cached data as Flow for observing in UI.
-     */
+    // Emits cached stations first, fetches from API, saves to Room, then emits the updated list.
     fun getAllStations(): Flow<List<ChargingStationEntity>> = flow {
         try {
             // 1. Emit local data first (cached)
@@ -55,9 +64,7 @@ class StationRepository @Inject constructor(
         }
     }
 
-    /**
-     * Get single station by ID from API or local DB.
-     */
+    // Retrieves a single station: tries API first (and caches on success), otherwise falls back to local DB.
     suspend fun getStationById(stationId: String): ChargingStationEntity? {
         return try {
             val response = stationApiService.getStationById(stationId)
@@ -85,9 +92,7 @@ class StationRepository @Inject constructor(
         }
     }
 
-    /**
-     * Local-only search by name or type.
-     */
+    // Local-only search on Room database by name or type (no network call).
     suspend fun searchStations(query: String): List<ChargingStationEntity> {
         return stationDao.searchStations("%$query%")
     }

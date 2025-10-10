@@ -1,3 +1,16 @@
+/**
+ * ------------------------------------------------------------
+ * File: MainActivity.kt
+ * Author: Panchali Samarasinghe
+ * Date: 2025-10-10
+ *
+ * Description:
+ * This is the main entry point of the VoltGo app. It initializes the local database,
+ * launches the UI using Jetpack Compose, and sets up the main navigation graph.
+ * Dagger Hilt is used for dependency injection.
+ * ------------------------------------------------------------
+ */
+
 package lk.voltgo.voltgo
 
 import android.os.Bundle
@@ -21,6 +34,7 @@ import lk.voltgo.voltgo.navigation.VoltGoNavigation
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    // Called when the activity is first created; initializes the Room database and sets up UI.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -40,6 +54,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+// Composable function that defines the main app layout and navigation graph.
 @Composable
 fun ChargeHereApp() {
     val navController = rememberNavController()

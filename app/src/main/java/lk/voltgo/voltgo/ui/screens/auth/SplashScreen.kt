@@ -1,3 +1,17 @@
+/**
+ * ---------------------------------------------------------
+ * File: SplashScreen.kt
+ * Project: VoltGo ⚡ Mobile App
+ * Description:
+ *   Displays the splash screen shown at app launch.
+ *   Shows animated gradient background, app logo, and tagline
+ *   while checking authentication status before navigating to onboarding.
+ *
+ * Author: Panchali Samarasinghe
+ * Created: October 10, 2025
+ * Version: 1.0
+ * ---------------------------------------------------------
+ */
 package lk.voltgo.voltgo.ui.screens.auth
 
 import androidx.compose.foundation.background
@@ -16,11 +30,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.delay
 import lk.voltgo.voltgo.ui.theme.AppColors
 import lk.voltgo.voltgo.ui.screens.auth.SplashViewModel
 
+// Displays the splash screen and navigates to onboarding after authentication check
 @Composable
 fun SplashScreen(
     onNavigateToOnboarding: () -> Unit,
@@ -105,8 +121,11 @@ fun SplashScreen(
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun SplashScreenPreview() {
-//    SplashScreen()
-//}
+// Displays a preview of the SplashScreen in Android Studio design view
+@Preview(showBackground = true)
+@Composable
+fun SplashScreenPreview() {
+    SplashScreen(
+        onNavigateToOnboarding = { /* No-op for preview */ }
+    )
+}

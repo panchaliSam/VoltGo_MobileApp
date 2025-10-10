@@ -1,3 +1,17 @@
+/**
+ * ---------------------------------------------------------
+ * File: EditProfileScreen.kt
+ * Project: VoltGo ⚡ Mobile App
+ * Description:
+ *   Provides the user interface for editing profile details such as
+ *   full name, email, phone number, NIC, and address.
+ *   Handles validation, saving changes, and displaying success/error messages.
+ *
+ * Author: Panchali Samarasinghe
+ * Created: October 10, 2025
+ * Version: 1.0
+ * ---------------------------------------------------------
+ */
 package lk.voltgo.voltgo.ui.screens.auth
 
 import androidx.compose.foundation.background
@@ -41,6 +55,7 @@ data class ProfileForm(
     val isActive: Boolean = true
 )
 
+// Main composable that manages the profile edit flow including loading, saving, and error handling
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(
@@ -119,6 +134,7 @@ fun EditProfileScreen(
     }
 }
 
+// Displays the editable profile form and handles input validation and saving logic
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileContent(
@@ -374,6 +390,7 @@ fun EditProfileContent(
     }
 }
 
+// Displays error message and retry button when loading profile fails
 @Composable
 private fun ErrorContent(
     message: String,
@@ -394,6 +411,7 @@ private fun ErrorContent(
     }
 }
 
+// Preview composable for Android Studio to visualize the Edit Profile screen
 @Preview(showBackground = true)
 @Composable
 private fun EditProfileScreenPreview() {

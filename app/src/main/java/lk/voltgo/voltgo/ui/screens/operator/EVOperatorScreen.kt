@@ -1,3 +1,18 @@
+/**
+ * ------------------------------------------------------------
+ * File: EVOperatorScreen.kt
+ * Author: Ishini Aposo
+ * Created: October 10, 2025
+ * Version: 1.0
+ *
+ * Description:
+ * This file defines the Operator screen of the VoltGo app.
+ * It allows EV station operators to manage reservations, scan QR codes,
+ * and view active or past bookings for a selected charging station.
+ * The UI includes a summary card, reservation list, and quick scan feature.
+ * ------------------------------------------------------------
+ */
+
 package lk.voltgo.voltgo.ui.screens.operator
 
 import androidx.compose.foundation.background
@@ -27,6 +42,9 @@ import lk.voltgo.voltgo.ui.screens.main.ReservationUi
 import lk.voltgo.voltgo.ui.screens.main.StatusChip
 import lk.voltgo.voltgo.ui.theme.AppColors
 
+// Main composable for the EV Operator Screen.
+// Displays a list of reservations for a specific station, along with
+// options to refresh, view reservation details, and perform QR scans.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EVOperatorScreen(
@@ -148,6 +166,8 @@ fun EVOperatorScreen(
     }
 }
 
+// Displays a single reservation entry with details like ID, date/time, and status.
+// Provides buttons to view details or scan the reservation QR code.
 @Composable
 private fun OperatorReservationCard(
     res: ReservationUi,
@@ -230,6 +250,7 @@ private fun OperatorReservationCard(
     }
 }
 
+// Displays a friendly message when there are no reservations for the selected station.
 @Composable
 private fun OperatorEmptyState() {
     Column(
@@ -255,6 +276,7 @@ private fun OperatorEmptyState() {
 }
 
 /* ---------- Preview ---------- */
+// Preview function for displaying the EVOperatorScreen layout in Android Studio.
 @Preview(showBackground = true, widthDp = 420)
 @Composable
 private fun EVOperatorScreenPreview() {

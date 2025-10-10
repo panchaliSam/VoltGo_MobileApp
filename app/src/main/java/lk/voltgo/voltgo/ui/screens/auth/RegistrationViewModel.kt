@@ -1,3 +1,17 @@
+/**
+ * ---------------------------------------------------------
+ * File: RegistrationViewModel.kt
+ * Project: VoltGo ⚡ Mobile App
+ * Description:
+ *   ViewModel responsible for handling user registration logic.
+ *   Manages UI state, input validation, API communication via AuthManager,
+ *   and navigation events after registration.
+ *
+ * Author: Panchali Samarasinghe
+ * Created: October 10, 2025
+ * Version: 1.0
+ * ---------------------------------------------------------
+ */
 package lk.voltgo.voltgo.ui.screens.auth
 
 import androidx.lifecycle.ViewModel
@@ -31,6 +45,7 @@ class RegistrationViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(RegistrationUiState())
     val uiState: StateFlow<RegistrationUiState> = _uiState.asStateFlow()
 
+    // Handles user registration logic including validation and API call
     fun registerUser(
         email: String,
         phone: String,
@@ -84,10 +99,12 @@ class RegistrationViewModel @Inject constructor(
         }
     }
 
+    // Resets navigation event once handled to avoid repeated navigation
     fun onNavigationHandled() {
         _uiState.value = _uiState.value.copy(navigationEvent = null)
     }
 
+    // Performs basic client-side validation on registration input fields
     private fun validateInputs(
         email: String,
         phone: String,
