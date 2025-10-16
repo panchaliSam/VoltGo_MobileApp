@@ -35,9 +35,6 @@ data class UserEntity(
         @ColumnInfo(name = "email")
         val email: String,
 
-        @ColumnInfo(name = "fullname")
-        val fullname: String? = null,
-
         @ColumnInfo(name = "phone")
         val phone: String,
 
