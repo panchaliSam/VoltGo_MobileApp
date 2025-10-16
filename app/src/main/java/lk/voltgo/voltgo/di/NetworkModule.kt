@@ -1,3 +1,17 @@
+/**
+ * ------------------------------------------------------------
+ * File: NetworkModule.kt
+ * Authors: Ishini Aposo & Panchali Samarasinghe
+ * Date: 2025-10-10
+ *
+ * Description:
+ * This Dagger Hilt module provides all the network-related dependencies for the VoltGo app.
+ * It includes configuration for Retrofit, OkHttpClient, authentication interceptors,
+ * and HTTP logging. These components ensure secure and efficient API communication
+ * between the app and backend services.
+ * ------------------------------------------------------------
+ */
+
 package lk.voltgo.voltgo.di
 
 import kotlinx.coroutines.runBlocking
@@ -21,6 +35,7 @@ object NetworkModule {
 
     private const val BASE_URL = "http://10.0.2.2:5005"
 
+    // Provides the authentication interceptor that attaches the Bearer token to API requests.
     @Provides
     @Singleton
     fun provideAuthInterceptor(tokenManager: TokenManager): Interceptor {
@@ -48,6 +63,7 @@ object NetworkModule {
         }
     }
 
+    // Provides the OkHttpClient configured with authentication and logging interceptors.
     @Provides
     @Singleton
     fun provideOkHttpClient(
@@ -60,6 +76,7 @@ object NetworkModule {
             .build()
     }
 
+    // Provides the Retrofit instance used for API communication with the backend.
     @Provides
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
@@ -70,7 +87,7 @@ object NetworkModule {
             .build()
     }
 
-
+    // Provides the HTTP logging interceptor for monitoring API request and response logs.
     @Provides
     @Singleton
     fun provideLoggingInterceptor(): HttpLoggingInterceptor {
@@ -79,19 +96,18 @@ object NetworkModule {
         }
     }
 
-    //API Services
+    // Provides the AuthApiService for authentication-related network calls.
     @Provides
     @Singleton
     fun provideAuthApiService(retrofit: Retrofit): AuthApiService {
         return retrofit.create(AuthApiService::class.java)
     }
 
+    // Provides the StationApiService for station-related network calls.
     @Provides
     @Singleton
     fun provideStationApiService(retrofit: Retrofit): StationApiService {
         return retrofit.create(StationApiService::class.java)
     }
-
-
 
 }

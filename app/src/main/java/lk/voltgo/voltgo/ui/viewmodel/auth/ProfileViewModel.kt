@@ -1,4 +1,18 @@
-package lk.voltgo.voltgo.ui.screens.auth
+/**
+ * ---------------------------------------------------------
+ * File: ProfileViewModel.kt
+ * Project: VoltGo ⚡ Mobile App
+ * Description:
+ *   ViewModel responsible for managing user profile operations.
+ *   Handles fetching and updating user profile data using AuthManager.
+ *   Manages UI states such as loading, success, and error through StateFlow.
+ *
+ * Author: Panchali Samarasinghe
+ * Created: October 10, 2025
+ * Version: 1.0
+ * ---------------------------------------------------------
+ */
+package lk.voltgo.voltgo.ui.viewmodel.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -28,6 +42,7 @@ class ProfileViewModel @Inject constructor(
     private val _updateState = MutableStateFlow<UiState<Unit>?>(null)
     val updateState = _updateState.asStateFlow()
 
+    // Loads the user's profile data from AuthManager and updates the UI state accordingly
     fun loadProfile() {
         viewModelScope.launch {
             _profileState.value = UiState.Loading
@@ -42,6 +57,7 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    // Sends updated profile data to AuthManager and updates the UI state after success or failure
     fun updateProfile(updateProfileRequest: UpdateProfileRequest) {
         viewModelScope.launch {
             _updateState.value = UiState.Loading

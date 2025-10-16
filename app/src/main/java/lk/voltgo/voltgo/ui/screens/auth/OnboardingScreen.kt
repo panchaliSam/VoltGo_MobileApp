@@ -1,3 +1,18 @@
+/**
+ * ---------------------------------------------------------
+ * File: OnboardingScreen.kt
+ * Project: VoltGo ⚡ Mobile App
+ * Description:
+ *   Displays the onboarding flow for new users.
+ *   Provides swipeable pages introducing app features such as station discovery,
+ *   slot reservation, and seamless charging experience.
+ *   Includes navigation controls for Next, Skip, and Get Started actions.
+ *
+ * Author: Panchali Samarasinghe
+ * Created: October 10, 2025
+ * Version: 1.0
+ * ---------------------------------------------------------
+ */
 package lk.voltgo.voltgo.ui.screens.auth
 
 import androidx.compose.foundation.background
@@ -28,6 +43,7 @@ import androidx.compose.material3.Icon
 
 data class OnboardPage(val title: String, val desc: String)
 
+// Main composable displaying the onboarding flow with pager and navigation buttons
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun OnboardingScreen(
@@ -166,6 +182,7 @@ fun OnboardingScreen(
     }
 }
 
+// Displays a preview of the onboarding screen in Android Studio design view
 @Preview(showBackground = true)
 @Composable
 private fun OnboardingPreview() {

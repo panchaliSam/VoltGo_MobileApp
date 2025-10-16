@@ -1,3 +1,18 @@
+/**
+ * ------------------------------------------------------------
+ * File: StationsScreen.kt
+ * Author: Ishini Aposo
+ * Created: October 10, 2025
+ * Version: 1.0
+ *
+ * Description:
+ * This file defines the Stations screen of the VoltGo app.
+ * It allows users to view available EV charging stations on a map,
+ * filter stations using a search bar, and view station summary cards.
+ * The screen integrates Google Maps and displays station markers dynamically.
+ * ------------------------------------------------------------
+ */
+
 package lk.voltgo.voltgo.ui.screens.main
 
 import android.annotation.SuppressLint
@@ -23,7 +38,11 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import lk.voltgo.voltgo.ui.theme.AppColors
+import lk.voltgo.voltgo.ui.viewmodel.main.StationViewModel
 
+// Main composable for the Stations Screen.
+// Displays a map with EV charging stations, search functionality,
+// and summary cards for pending and approved stations.
 @SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -144,6 +163,8 @@ fun StationsScreen(
 
 /* ---------- Reused/updated UI pieces to match MyReservations look ---------- */
 
+// Reusable UI component that displays a gradient-bordered summary card
+// showing the number of stations for a specific status (e.g., Pending, Approved).
 @Composable
 private fun RowScope.StationSummaryCard(
     label: String,
@@ -184,6 +205,8 @@ private fun RowScope.StationSummaryCard(
     }
 }
 
+// Search bar component for filtering stations by name.
+// Accepts the current query and a callback to handle query changes.
 @Composable
 fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
     // functionally identical; light style nudge to fit white bg
@@ -216,6 +239,7 @@ fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
 }
 
 /* ---------- Preview ---------- */
+// Preview function for displaying the Stations Screen layout in Android Studio’s preview mode.
 @Preview(showBackground = true, widthDp = 420)
 @Composable
 fun StationsScreenPreview() {

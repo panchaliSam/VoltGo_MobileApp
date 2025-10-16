@@ -1,3 +1,16 @@
+/**
+ * ------------------------------------------------------------
+ * File: VoltGoDatabase.kt
+ * Authors: Panchali Samarasinghe, Ishini Aponso
+ * Date: 2025-10-10
+ *
+ * Description:
+ * This class defines the Room database configuration for the VoltGo app. It serves as the
+ * main access point for the app’s persisted data, linking entity classes with their
+ * respective DAOs. It also includes logic to build the database instance and pre-seed
+ * initial data when the database is first created.
+ * ------------------------------------------------------------
+ */
 package lk.voltgo.voltgo.data.local
 
 import android.content.Context
@@ -31,10 +44,19 @@ import lk.voltgo.voltgo.data.local.seeders.SlotSeeder
 )
 abstract class VoltGoDatabase : RoomDatabase() {
 
+    // Provides access to the User DAO for user-related operations.
     abstract fun userDao(): UserDao
+
+    // Provides access to the EV Owner DAO for managing EV owner data.
     abstract fun evOwnerDao(): EVOwnerDao
+
+    // Provides access to the Reservation DAO for reservation management.
     abstract fun reservationDao(): ReservationDao
+
+    // Provides access to the Charging Station DAO for station data operations.
     abstract fun chargingStationDao(): ChargingStationDao
+
+    // Provides access to the Slot DAO for slot availability management.
     abstract fun slotDao(): SlotDao
 
 
@@ -44,6 +66,7 @@ abstract class VoltGoDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: VoltGoDatabase? = null
 
+        // Returns a singleton instance of the VoltGo database, creating it if not already initialized.
         fun getDatabase(context: Context): VoltGoDatabase {
             return INSTANCE ?: synchronized(this) {
                 lateinit var createdInstance: VoltGoDatabase
@@ -63,9 +86,9 @@ abstract class VoltGoDatabase : RoomDatabase() {
                                 // Seed in order (FK safety)
                                 UserSeeder.seed(createdInstance.userDao())
                                 EVOwnerSeeder.seed(createdInstance.evOwnerDao())
-                                ReservationSeeder.seed(createdInstance.reservationDao())
                                 ChargingStationSeeder.seed(createdInstance.chargingStationDao())
                                 SlotSeeder.seed( createdInstance.slotDao())
+                                ReservationSeeder.seed(createdInstance.reservationDao())
                             }
                         }
                     })

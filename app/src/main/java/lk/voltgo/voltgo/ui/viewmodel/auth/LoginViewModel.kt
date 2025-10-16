@@ -1,4 +1,18 @@
-package lk.voltgo.voltgo.ui.screens.auth
+/**
+ * ---------------------------------------------------------
+ * File: LoginViewModel.kt
+ * Project: VoltGo ⚡ Mobile App
+ * Description:
+ *   ViewModel responsible for managing user login functionality.
+ *   Handles login requests, authentication via AuthManager, UI state management,
+ *   and navigation events based on user roles (EV Owner or Operator).
+ *
+ * Author: Panchali Samarasinghe
+ * Created: October 10, 2025
+ * Version: 1.0
+ * ---------------------------------------------------------
+ */
+package lk.voltgo.voltgo.ui.viewmodel.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -37,6 +51,7 @@ class LoginViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
+    // Handles user login by calling AuthManager and updates UI state and navigation events
     fun loginUser(username: String, password: String) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
@@ -47,11 +62,11 @@ class LoginViewModel @Inject constructor(
                 when {
                     result.isSuccess -> {
                         val response = result.getOrNull()
-                        when (response?.role?.lowercase()) {
-                            "evowner" -> _uiState.value = LoginUiState(navigationEvent = LoginNavigationEvent.NavigateToMain(
+                        when (response?.role) {
+                            "EV_OWNER" -> _uiState.value = LoginUiState(navigationEvent = LoginNavigationEvent.NavigateToMain(
                                 token = response.token
                             ))
-                            "operator" -> _uiState.value = LoginUiState(navigationEvent = LoginNavigationEvent.NavigateToOperator)
+                            "STATION_OPERATOR" -> _uiState.value = LoginUiState(navigationEvent = LoginNavigationEvent.NavigateToOperator)
                             else -> _uiState.value = LoginUiState(errorMessage = "Invalid role")
                         }
                     }
@@ -65,6 +80,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+    // Clears navigation events after they are processed to prevent re-triggering
     fun onNavigationHandled() {
         _uiState.value = _uiState.value.copy(navigationEvent = null)
     }
