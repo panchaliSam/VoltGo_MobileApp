@@ -50,6 +50,7 @@ import lk.voltgo.voltgo.ui.viewmodel.auth.LoginViewModel
 @Composable
 fun LoginScreen(
     onLoginSuccess: (String) -> Unit,
+    onOperatorLoginSuccess: (String) -> Unit,
     onNavigateToRegister: () -> Unit,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
@@ -161,11 +162,11 @@ fun LoginScreen(
                         viewModel.onNavigationHandled()
                     }
                     is LoginNavigationEvent.NavigateToMain -> {
-                        onLoginSuccess(event.token) // Navigate to main screen for EVOwner
+                        onLoginSuccess(event.token)
                         viewModel.onNavigationHandled()
                     }
                     is LoginNavigationEvent.NavigateToOperator -> {
-                        // Handle operator navigation if needed
+                        onOperatorLoginSuccess(event.token)
                         viewModel.onNavigationHandled()
                     }
                     null -> {}
@@ -183,6 +184,7 @@ fun LoginScreen(
 private fun LoginPreview() {
     LoginScreen(
         onLoginSuccess = { _ -> },
-        onNavigateToRegister = {}
+        onNavigateToRegister = {},
+        onOperatorLoginSuccess = {}
     )
 }
