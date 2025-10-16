@@ -1,6 +1,7 @@
 package lk.voltgo.voltgo.domain.model
 
 import lk.voltgo.voltgo.data.local.entities.UserEntity
+import lk.voltgo.voltgo.data.remote.types.RoleType
 
 /**
  * Domain model for a signed-in / persisted user.
@@ -10,7 +11,7 @@ data class User(
     val userId: String,
     val email: String,
     val phone: String,
-    val role: String = "EVOwner",
+    val role: RoleType = RoleType.EV_OWNER,
     val nic: String? = null,
     val fullName: String? = null,  // maps from username (if you treat it as full name)
     val address: String? = null,
@@ -26,7 +27,7 @@ fun UserEntity.toDomain(): User {
         role = role,
         nic = nic,
         // Prefer the properly-cased fullName column; fallback to legacy `fullname`
-        fullName = fullName ?: fullname,
+        fullName = fullName,
         address = address,
         isActive = isActive
     )
@@ -37,8 +38,6 @@ fun User.toEntity(): UserEntity {
     return UserEntity(
         userId = userId,
         email = email,
-        // keep legacy `fullname` empty; use the proper `fullName` column
-        fullname = null,
         phone = phone,
         role = role,
         isActive = isActive,

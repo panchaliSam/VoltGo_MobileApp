@@ -28,6 +28,7 @@ import lk.voltgo.voltgo.ui.screens.main.CreateReservationScreen
 import lk.voltgo.voltgo.ui.screens.main.StationsScreen
 import lk.voltgo.voltgo.ui.screens.main.HomeScreen
 import lk.voltgo.voltgo.ui.screens.main.MyReservationsScreen
+import lk.voltgo.voltgo.ui.screens.operator.EVOperatorScreen
 
 @Composable
 // Sets up the navigation graph for VoltGo app including authentication and main flows
@@ -73,6 +74,12 @@ fun VoltGoNavigation(
                             launchSingleTop = true
                         }
                     },
+                    onOperatorLoginSuccess = { token: String ->
+                        navController.navigate(NavigationGraph.Operator.route) {
+                            popUpTo(NavigationGraph.Auth.route) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    },
                     onNavigateToRegister = {
                         navController.navigate(Screen.Register.route)
                     }
@@ -93,13 +100,44 @@ fun VoltGoNavigation(
                 )
             }
         }
+        navigation(
+            startDestination = Screen.OperatorHome.route,
+            route = NavigationGraph.Operator.route
+        ) {
+            composable(Screen.OperatorHome.route) {
+                // You can fetch this from a ViewModel; hardcoded here for clarity
+                val stationName = "Downtown SuperCharge"
+
+                EVOperatorScreen(
+                    stationName = stationName,
+                    onBackClick = { navController.popBackStack() },
+                    onRefresh = {
+                        // TODO: trigger refresh (e.g., viewModel.refreshOperatorData())
+                    },
+                    onViewReservation = { res ->
+                        // Navigate to reservation details
+                        // TODO: trigger refresh (e.g., viewModel.refreshOperatorData())
+                        //navController.navigate("${Screen.ReservationDetails.route}/${res.id}")
+                    },
+                    onScanQrFor = { res ->
+                        // Open scanner initialized for a specific reservation
+                        // TODO: trigger refresh (e.g., viewModel.refreshOperatorData())
+                        //navController.navigate("${Screen.QRScanner.route}?reservationId=${res.id}")
+                    },
+                    onQuickScan = {
+                        // Open generic scanner
+                        // TODO: trigger refresh (e.g., viewModel.refreshOperatorData())
+                        //navController.navigate(Screen.QRScanner.route)
+                    }
+                )
+            }
+        }
         // Main navigation graph for EV owner features (Home, Reservations, Stations, Profile)
         navigation(
             startDestination = Screen.Home.route,
-            route = NavigationGraph.Main.route       // "main_graph"
+            route = NavigationGraph.Main.route
         ) {
             composable(Screen.Home.route) {
-                // Home Screen - provides access to My Reservations, New Reservation, Stations, and Profile
                 HomeScreen(
                     onMyReservationsClick = {
                         navController.navigate(Screen.MyReservations.route)

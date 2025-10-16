@@ -83,7 +83,6 @@ class UserRepository @Inject constructor(
                     val userEntity = UserEntity(
                         userId = UUID.randomUUID().toString(),
                         email = email.trim(),
-                        fullname = null,                 // or derive from email: email.substringBefore("@")
                         phone = phone.trim(),
                         role = RoleType.EV_OWNER,                // default as requested
                         isActive = true,

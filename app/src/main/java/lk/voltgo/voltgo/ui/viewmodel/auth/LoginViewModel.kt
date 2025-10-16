@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import lk.voltgo.voltgo.auth.AuthManager
+import lk.voltgo.voltgo.data.remote.types.RoleType
 import javax.inject.Inject
 
 data class LoginUiState(
@@ -37,9 +38,13 @@ sealed class LoginNavigationEvent {
         val displayName: String
     ) : LoginNavigationEvent()
     data class NavigateToMain(
-        val token: String
+        val token: String,
+        val role: RoleType
     ) : LoginNavigationEvent()
-    data object NavigateToOperator : LoginNavigationEvent()
+    data class NavigateToOperator(
+        val token: String,
+        val role: RoleType
+    ) : LoginNavigationEvent()
 }
 
 
@@ -63,10 +68,14 @@ class LoginViewModel @Inject constructor(
                     result.isSuccess -> {
                         val response = result.getOrNull()
                         when (response?.role) {
-                            "EV_OWNER" -> _uiState.value = LoginUiState(navigationEvent = LoginNavigationEvent.NavigateToMain(
-                                token = response.token
+                            RoleType.EV_OWNER  -> _uiState.value = LoginUiState(navigationEvent = LoginNavigationEvent.NavigateToMain(
+                                token = response.token,
+                                role = response.role
                             ))
-                            "STATION_OPERATOR" -> _uiState.value = LoginUiState(navigationEvent = LoginNavigationEvent.NavigateToOperator)
+                            RoleType.STATION_OPERATOR  -> _uiState.value = LoginUiState(navigationEvent = LoginNavigationEvent.NavigateToOperator(
+                                token = response.token,
+                                role = response.role
+                            ))
                             else -> _uiState.value = LoginUiState(errorMessage = "Invalid role")
                         }
                     }
