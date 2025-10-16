@@ -21,7 +21,7 @@ data class AuthResponse(
     @SerializedName("token")
     val token: String,
     @SerializedName("role")
-    val role: String,
+    val role: RoleType,
 )
 
 // Represents the user object included in the AuthResponse.

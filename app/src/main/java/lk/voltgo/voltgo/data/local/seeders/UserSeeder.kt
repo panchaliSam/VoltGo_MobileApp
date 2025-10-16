@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import lk.voltgo.voltgo.data.local.dao.UserDao
 import lk.voltgo.voltgo.data.local.entities.UserEntity
+import lk.voltgo.voltgo.data.remote.types.RoleType
 import java.time.Instant
 
 object UserSeeder {
@@ -21,9 +22,8 @@ object UserSeeder {
                 UserEntity(
                     userId = "672c2f2f0000000000000001",
                     email = "john.doe@gmail.com",
-                    fullname = "john",
                     phone = "0771234567",
-                    role = "EVOwner",          // matches backend default
+                    role = RoleType.STATION_OPERATOR,          // matches backend default
                     isActive = true,
                     nic = "901234567V",
                     fullName = "John Doe",
@@ -34,26 +34,12 @@ object UserSeeder {
                 UserEntity(
                     userId = "672c2f2f0000000000000002",
                     email = "operator@example.com",
-                    fullname = "station-op",
                     phone = "0779876543",
-                    role = "StationOperator",
+                    role = RoleType.STATION_OPERATOR,
                     isActive = true,
                     nic = null,
                     fullName = "Operator User",
                     address = "Station Road, Kandy",
-                    createdAt = nowIso,
-                    lastLoginAt = null
-                ),
-                UserEntity(
-                    userId = "672c2f2f0000000000000003",
-                    email = "backoffice@example.com",
-                    fullname = "backoffice",
-                    phone = "0711111111",
-                    role = "BackOffice",
-                    isActive = true,
-                    nic = null,
-                    fullName = "Backoffice Admin",
-                    address = "HQ, Sri Lanka",
                     createdAt = nowIso,
                     lastLoginAt = null
                 )
