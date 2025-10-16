@@ -138,7 +138,6 @@ fun VoltGoNavigation(
             route = NavigationGraph.Main.route
         ) {
             composable(Screen.Home.route) {
-                // Home Screen - provides access to My Reservations, New Reservation, Stations, and Profile
                 HomeScreen(
                     onMyReservationsClick = {
                         navController.navigate(Screen.MyReservations.route)
