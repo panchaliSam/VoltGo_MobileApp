@@ -1,3 +1,16 @@
+/**
+ * ------------------------------------------------------------
+ * File: DataStoreModule.kt
+ * Authors: Ishini Aposo & Panchali Samarasinghe
+ * Date: 2025-10-10
+ *
+ * Description:
+ * This Dagger Hilt module provides the singleton instance of the Android Jetpack DataStore
+ * used for managing and persisting user preferences across the VoltGo app. It replaces
+ * SharedPreferences and ensures type-safe, asynchronous data storage.
+ * ------------------------------------------------------------
+ */
+
 package lk.voltgo.voltgo.di
 
 import android.content.Context
@@ -18,6 +31,7 @@ private const val USER_PREFERENCES_NAME = "user_preferences"
 @InstallIn(SingletonComponent::class)
 object DataStoreModule {
 
+    // Provides a singleton instance of the DataStore for storing user preferences.
     @Provides
     @Singleton
     fun providePreferencesDataStore(@ApplicationContext appContext: Context): DataStore<Preferences> {

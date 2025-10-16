@@ -1,4 +1,18 @@
-package lk.voltgo.voltgo.ui.screens.main
+package lk.voltgo.voltgo.ui.viewmodel.main
+
+/**
+ * ------------------------------------------------------------
+ * File: StationViewModel.kt
+ * Author: Ishini Aposo
+ * Created: October 10, 2025
+ * Version: 1.0
+ *
+ * Description:
+ * This ViewModel manages the state and logic for the Stations screen in the VoltGo app.
+ * It communicates with the StationManager to load, search, and manage charging station data.
+ * The ViewModel exposes UI state using StateFlow and handles asynchronous operations with coroutines.
+ * ------------------------------------------------------------
+ */
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -28,6 +42,8 @@ class StationViewModel @Inject constructor(
         loadStations()
     }
 
+    // Loads all charging stations from the StationManager.
+    // Updates the UI state to show a loading indicator, and populates the station list when complete.
     fun loadStations() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
@@ -48,6 +64,8 @@ class StationViewModel @Inject constructor(
         }
     }
 
+    // Searches charging stations based on the user’s query.
+    // Updates the UI state with the filtered results or an error message if the search fails.
     fun searchStations(query: String) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, searchQuery = query)
@@ -66,6 +84,7 @@ class StationViewModel @Inject constructor(
         }
     }
 
+    // Clears any existing error message from the UI state.
     fun clearError() {
         _uiState.value = _uiState.value.copy(errorMessage = null)
     }

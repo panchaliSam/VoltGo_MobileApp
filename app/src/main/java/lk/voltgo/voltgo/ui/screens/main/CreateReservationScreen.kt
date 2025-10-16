@@ -1,3 +1,17 @@
+/**
+ * ------------------------------------------------------------
+ * File: CreateReservationScreen.kt
+ * Author: Panchali Samarasinghe
+ * Created: October 10, 2025
+ * Version: 1.0
+ *
+ * Description:
+ * This file defines the UI and logic for creating a new EV charging reservation
+ * in the VoltGo app. It includes a form with station selection, date/time pickers,
+ * connector type selection, and notes, along with form validation and submission.
+ * ------------------------------------------------------------
+ */
+
 package lk.voltgo.voltgo.ui.screens.main
 
 import androidx.compose.foundation.background
@@ -35,6 +49,7 @@ import lk.voltgo.voltgo.ui.theme.AppColors
 
 /* ---------- Public API ---------- */
 
+// Data model representing all fields required for creating a new reservation.
 data class ReservationForm(
     val station: String,
     val date: String,       // e.g., 2025-10-12 (plug real date picker later)
@@ -46,6 +61,8 @@ data class ReservationForm(
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
+// Main composable that renders the Create Reservation screen UI.
+// Includes input fields, dropdowns, and form validation before submission.
 @Composable
 fun CreateReservationScreen(
     onBackClick: () -> Unit,
@@ -360,6 +377,7 @@ fun CreateReservationScreen(
 
 /* ---------- Preview ---------- */
 
+// Preview function for displaying the Create Reservation screen in Android Studio's preview mode.
 @Preview(showBackground = true, widthDp = 420)
 @Composable
 private fun CreateReservationPreview() {

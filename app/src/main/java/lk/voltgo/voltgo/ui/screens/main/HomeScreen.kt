@@ -1,3 +1,19 @@
+/**
+ * ------------------------------------------------------------
+ * File: HomeScreen.kt
+ * Author: Panchali Samarasinghe
+ * Created: October 10, 2025
+ * Version: 1.0
+ *
+ * Description:
+ * This file defines the main home screen UI for the VoltGo app.
+ * It displays quick actions such as viewing reservations, creating
+ * new reservations, finding nearby stations, and accessing profile
+ * options (edit profile, logout). The layout uses Material 3 components
+ * and gradient action cards for better visual appeal.
+ * ------------------------------------------------------------
+ */
+
 package lk.voltgo.voltgo.ui.screens.main
 
 import androidx.compose.foundation.layout.*
@@ -19,6 +35,8 @@ import androidx.compose.ui.unit.dp
 import lk.voltgo.voltgo.ui.components.GradientActionCard
 import lk.voltgo.voltgo.ui.theme.AppColors
 
+// Main composable for the Home Screen.
+// Displays greeting text, navigation cards, and a profile menu.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -127,6 +145,7 @@ fun HomeScreen(
     }
 }
 
+// Helper composable that displays small assist chips for quick actions.
 @Composable
 private fun AssistChipRow(
     onFindStationsClick: () -> Unit,
@@ -144,6 +163,7 @@ private fun AssistChipRow(
     }
 }
 
+// Preview function for displaying the Home Screen in Android Studio’s preview mode.
 @Preview(showBackground = true)
 @Composable
 private fun HomeScreenPreview() {

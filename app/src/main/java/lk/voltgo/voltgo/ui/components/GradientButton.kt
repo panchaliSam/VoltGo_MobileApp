@@ -1,3 +1,16 @@
+/**
+ * ------------------------------------------------------------
+ * File: GradientButton.kt
+ * Author: Panchali Samarasinghe
+ * Date: 2025-10-10
+ *
+ * Description:
+ * This composable function defines a reusable gradient-styled button
+ * component for the VoltGo app. It supports customization options
+ * such as enabling/disabling, loading state, and dynamic sizing.
+ * ------------------------------------------------------------
+ */
+
 package lk.voltgo.voltgo.ui.components
 
 import androidx.compose.foundation.background
@@ -18,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import lk.voltgo.voltgo.ui.theme.AppColors
 
+// Composable function that creates a customizable gradient button with text and click behavior
 @Composable
 fun GradientButton(
     text: String,
