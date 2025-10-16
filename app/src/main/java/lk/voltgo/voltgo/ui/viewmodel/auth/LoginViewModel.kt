@@ -12,7 +12,7 @@
  * Version: 1.0
  * ---------------------------------------------------------
  */
-package lk.voltgo.voltgo.ui.screens.auth
+package lk.voltgo.voltgo.ui.viewmodel.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -62,11 +62,11 @@ class LoginViewModel @Inject constructor(
                 when {
                     result.isSuccess -> {
                         val response = result.getOrNull()
-                        when (response?.role?.lowercase()) {
-                            "evowner" -> _uiState.value = LoginUiState(navigationEvent = LoginNavigationEvent.NavigateToMain(
+                        when (response?.role) {
+                            "EV_OWNER" -> _uiState.value = LoginUiState(navigationEvent = LoginNavigationEvent.NavigateToMain(
                                 token = response.token
                             ))
-                            "operator" -> _uiState.value = LoginUiState(navigationEvent = LoginNavigationEvent.NavigateToOperator)
+                            "STATION_OPERATOR" -> _uiState.value = LoginUiState(navigationEvent = LoginNavigationEvent.NavigateToOperator)
                             else -> _uiState.value = LoginUiState(errorMessage = "Invalid role")
                         }
                     }

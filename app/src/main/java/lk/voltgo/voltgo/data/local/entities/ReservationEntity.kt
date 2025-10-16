@@ -5,9 +5,8 @@
  * Date: 2025-10-10
  *
  * Description:
- * This file defines the Room entity representing a reservation record in the VoltGo app.
- * Each reservation is linked to a user (owner), station, and slot, and includes start/end times,
- * reservation status, and synchronization tracking with the backend server.
+ * Room entity for reservations. Each reservation links to a user (owner),
+ * a station, and a slot. Includes start/end times, status, and sync flags.
  * ------------------------------------------------------------
  */
 package lk.voltgo.voltgo.data.local.entities
@@ -18,13 +17,12 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-// Room Entity representing a reservation record with foreign keys to User, Station, and Slot entities.
 @Entity(
     tableName = "reservation",
     indices = [
-        Index(value = ["owner_id", "start_time"], name = "idx_reservation_owner_time"),
-        Index(value = ["station_id"]),
-        Index(value = ["slot_id"])
+        Index(value = ["owner_id", "start_time"], name = "idx_res_owner_time"),
+        Index(value = ["station_id"], name = "idx_res_station"),
+        Index(value = ["slot_id"], name = "idx_res_slot")
     ],
     foreignKeys = [
         ForeignKey(
@@ -33,49 +31,74 @@ import androidx.room.PrimaryKey
             childColumns = ["owner_id"],
             onDelete = ForeignKey.CASCADE,
             onUpdate = ForeignKey.NO_ACTION
+        ),
+        ForeignKey( // link to charging_station
+            entity = ChargingStationEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["station_id"],
+            onDelete = ForeignKey.NO_ACTION,
+            onUpdate = ForeignKey.NO_ACTION
+        ),
+        ForeignKey( // link to slot
+            entity = SlotEntity::class,
+            parentColumns = ["slot_id"],
+            childColumns = ["slot_id"],
+            onDelete = ForeignKey.NO_ACTION,
+            onUpdate = ForeignKey.NO_ACTION
         )
-        // If you later create StationEntity / SlotEntity, add FKs similarly.
     ]
 )
 data class ReservationEntity(
-    // Primary key uniquely identifying each reservation record.
+    // Primary key (can be a Mongo ObjectId string mirrored from backend)
     @PrimaryKey
     @ColumnInfo(name = "reservation_id")
     val reservationId: String,
 
-    // Foreign key referencing the user who owns the reservation.
+    // Local link to the app user who owns the reservation
     @ColumnInfo(name = "owner_id")
-    val ownerId: String,           // FK -> user.user_id
+    val ownerId: String, // FK -> user.user_id
 
-    // Foreign key referencing the station where the reservation is made.
+    // (Optional but useful for backend sync) NIC used by backend Booking.OwnerNIC
+    @ColumnInfo(name = "owner_nic")
+    val ownerNic: String? = null,
+
+    // Links to station & slot
     @ColumnInfo(name = "station_id")
-    val stationId: String,
+    val stationId: String, // FK -> charging_station.station_id
 
-    // Foreign key referencing the slot allocated for the reservation.
     @ColumnInfo(name = "slot_id")
-    val slotId: String,
+    val slotId: String,    // FK -> slot.slot_id
 
-    // Start time of the reservation (ISO8601 UTC recommended).
+    // Times (store as ISO-8601 UTC strings or use converters to Instant)
     @ColumnInfo(name = "start_time")
-    val startTime: String,         // ISO8601 UTC recommended
+    val startTime: String,
 
-    // End time of the reservation (ISO8601 UTC recommended).
     @ColumnInfo(name = "end_time")
-    val endTime: String,           // ISO8601 UTC recommended
+    val endTime: String,
 
-    // Current status of the reservation (PENDING, APPROVED, CANCELLED, COMPLETED).
+    // Status: Pending, Confirmed, Cancelled, Completed
+    // (Consider an enum + @TypeConverter for safety)
     @ColumnInfo(name = "status")
-    val status: String,            // PENDING, APPROVED, CANCELLED, COMPLETED
+    val status: String = "Pending",
 
-    // Indicates whether the reservation has been synced with the backend server.
+    // Optional fields to mirror backend timestamps (nullable)
+    @ColumnInfo(name = "confirmed_at")
+    val confirmedAt: String? = null,
+
+    @ColumnInfo(name = "completed_at")
+    val completedAt: String? = null,
+
+    @ColumnInfo(name = "cancelled_at")
+    val cancelledAt: String? = null,
+
+    // Sync flag with backend
     @ColumnInfo(name = "server_synced")
     val serverSynced: Boolean = false,
 
-    // Timestamp when the reservation was created.
+    // Audit fields
     @ColumnInfo(name = "created_at")
     val createdAt: String,
 
-    // Timestamp when the reservation was last updated.
     @ColumnInfo(name = "updated_at")
     val updatedAt: String
 )

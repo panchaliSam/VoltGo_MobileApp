@@ -38,6 +38,7 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import lk.voltgo.voltgo.ui.theme.AppColors
+import lk.voltgo.voltgo.ui.viewmodel.main.StationViewModel
 
 // Main composable for the Stations Screen.
 // Displays a map with EV charging stations, search functionality,

@@ -40,8 +40,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 
 import lk.voltgo.voltgo.ui.components.GradientButton
-import lk.voltgo.voltgo.ui.screens.auth.RegistrationViewModel
-import lk.voltgo.voltgo.ui.screens.auth.RegistrationNavigationEvent
+import lk.voltgo.voltgo.ui.viewmodel.auth.RegistrationViewModel
+import lk.voltgo.voltgo.ui.viewmodel.auth.RegistrationNavigationEvent
 import lk.voltgo.voltgo.ui.theme.AppColors
 
 data class RegisterRequest(

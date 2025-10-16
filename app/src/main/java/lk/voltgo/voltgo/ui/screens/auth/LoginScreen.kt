@@ -43,8 +43,8 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.hilt.navigation.compose.hiltViewModel
-import lk.voltgo.voltgo.ui.screens.auth.LoginNavigationEvent
-import lk.voltgo.voltgo.ui.screens.auth.LoginViewModel
+import lk.voltgo.voltgo.ui.viewmodel.auth.LoginNavigationEvent
+import lk.voltgo.voltgo.ui.viewmodel.auth.LoginViewModel
 
 // Displays the login screen, manages user input, and triggers login logic
 @Composable

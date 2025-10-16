@@ -16,6 +16,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import lk.voltgo.voltgo.data.remote.types.RoleType
 
 @Entity(
         tableName = "user",
@@ -40,8 +41,8 @@ data class UserEntity(
         @ColumnInfo(name = "phone")
         val phone: String,
 
-        @ColumnInfo(name = "role", defaultValue = "EVOwner")
-        val role: String = "EVOwner",       // BackOffice, StationOperator, EVOwner
+        @ColumnInfo(name = "role", defaultValue = "EV_OWNER")
+        val role: RoleType = RoleType.EV_OWNER,       // BackOffice, StationOperator, EVOwner
 
         @ColumnInfo(name = "is_active", defaultValue = "1")
         val isActive: Boolean = true,

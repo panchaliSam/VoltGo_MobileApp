@@ -43,6 +43,8 @@ import kotlinx.coroutines.launch
 import lk.voltgo.voltgo.data.remote.dto.UserProfileResponse
 import lk.voltgo.voltgo.ui.theme.AppColors
 import lk.voltgo.voltgo.data.remote.dto.UpdateProfileRequest
+import lk.voltgo.voltgo.ui.viewmodel.auth.ProfileViewModel
+import lk.voltgo.voltgo.ui.viewmodel.auth.UiState
 
 data class ProfileForm(
     val fullName: String = "",

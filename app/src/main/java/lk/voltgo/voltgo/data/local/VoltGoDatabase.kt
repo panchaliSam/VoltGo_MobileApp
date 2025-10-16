@@ -86,9 +86,9 @@ abstract class VoltGoDatabase : RoomDatabase() {
                                 // Seed in order (FK safety)
                                 UserSeeder.seed(createdInstance.userDao())
                                 EVOwnerSeeder.seed(createdInstance.evOwnerDao())
-                                ReservationSeeder.seed(createdInstance.reservationDao())
                                 ChargingStationSeeder.seed(createdInstance.chargingStationDao())
                                 SlotSeeder.seed( createdInstance.slotDao())
+                                ReservationSeeder.seed(createdInstance.reservationDao())
                             }
                         }
                     })

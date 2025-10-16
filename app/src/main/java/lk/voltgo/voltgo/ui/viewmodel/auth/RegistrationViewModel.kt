@@ -12,7 +12,7 @@
  * Version: 1.0
  * ---------------------------------------------------------
  */
-package lk.voltgo.voltgo.ui.screens.auth
+package lk.voltgo.voltgo.ui.viewmodel.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

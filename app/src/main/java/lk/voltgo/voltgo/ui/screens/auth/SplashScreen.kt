@@ -34,7 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.delay
 import lk.voltgo.voltgo.ui.theme.AppColors
-import lk.voltgo.voltgo.ui.screens.auth.SplashViewModel
+import lk.voltgo.voltgo.ui.viewmodel.auth.SplashViewModel
 
 // Displays the splash screen and navigates to onboarding after authentication check
 @Composable

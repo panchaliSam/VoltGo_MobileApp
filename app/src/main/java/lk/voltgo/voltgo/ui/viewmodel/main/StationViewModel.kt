@@ -1,4 +1,4 @@
-package lk.voltgo.voltgo.ui.screens.main
+package lk.voltgo.voltgo.ui.viewmodel.main
 
 /**
  * ------------------------------------------------------------

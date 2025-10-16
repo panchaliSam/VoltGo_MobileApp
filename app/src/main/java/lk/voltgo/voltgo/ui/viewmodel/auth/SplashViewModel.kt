@@ -1,3 +1,10 @@
+package lk.voltgo.voltgo.ui.viewmodel.auth
+
+import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import lk.voltgo.voltgo.auth.AuthManager
+import javax.inject.Inject
+
 /****
  * ---------------------------------------------------------
  * File: SplashViewModel.kt
@@ -11,13 +18,6 @@
  * Version: 1.0
  * ---------------------------------------------------------
  */
-package lk.voltgo.voltgo.ui.screens.auth
-
-import androidx.lifecycle.ViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
-import lk.voltgo.voltgo.auth.AuthManager
-import javax.inject.Inject
-
 @HiltViewModel
 class SplashViewModel @Inject constructor(
     private val authManager: AuthManager

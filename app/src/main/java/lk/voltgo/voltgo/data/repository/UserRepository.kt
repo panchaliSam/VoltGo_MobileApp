@@ -22,6 +22,7 @@ import lk.voltgo.voltgo.data.remote.dto.LoginRequest
 import lk.voltgo.voltgo.data.remote.dto.RegisterRequest
 import lk.voltgo.voltgo.data.remote.dto.UpdateProfileRequest
 import lk.voltgo.voltgo.data.remote.dto.UserProfileResponse
+import lk.voltgo.voltgo.data.remote.types.RoleType
 import lk.voltgo.voltgo.domain.model.User
 import lk.voltgo.voltgo.domain.model.toDomain
 import java.util.UUID
@@ -68,7 +69,7 @@ class UserRepository @Inject constructor(
                 email = email.trim(),
                 phone = phone.trim(),
                 password = password,
-                role = "EVOwner",
+                role = RoleType.EV_OWNER,
                 nic = nic.trim(),
                 fullName = fullName.trim(),
                 address = address.trim()
@@ -84,7 +85,7 @@ class UserRepository @Inject constructor(
                         email = email.trim(),
                         fullname = null,                 // or derive from email: email.substringBefore("@")
                         phone = phone.trim(),
-                        role = "EVOwner",                // default as requested
+                        role = RoleType.EV_OWNER,                // default as requested
                         isActive = true,
                         nic = nic.trim(),
                         fullName = fullName.trim(),

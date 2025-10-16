@@ -14,6 +14,7 @@
 package lk.voltgo.voltgo.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
+import lk.voltgo.voltgo.data.remote.types.RoleType
 
 // Represents the response returned from the authentication API after login.
 data class AuthResponse(
@@ -21,8 +22,6 @@ data class AuthResponse(
     val token: String,
     @SerializedName("role")
     val role: String,
-    @SerializedName("user")
-    val user: UserDto
 )
 
 // Represents the user object included in the AuthResponse.
@@ -54,7 +53,7 @@ data class RegisterRequest(
     @SerializedName("password")
     val password: String,
     @SerializedName("role")
-    val role: String = "EVOwner",
+    val role: RoleType = RoleType.EV_OWNER,
     @SerializedName("nic")
     val nic: String,
     @SerializedName("fullName")
