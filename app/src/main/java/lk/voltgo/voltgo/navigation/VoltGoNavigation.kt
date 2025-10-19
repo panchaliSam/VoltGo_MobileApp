@@ -151,11 +151,8 @@ fun VoltGoNavigation(
                     onEditProfileClick = {
                         navController.navigate(Screen.Profile.route)
                     },
-                    onLogoutClick = {
-                        navController.navigate(NavigationGraph.Auth.route) {
-                            popUpTo(NavigationGraph.Main.route) { inclusive = true }
-                            launchSingleTop = true
-                        }
+                    onNavigateToLogin = {
+                        navController.navigate(Screen.Login.route)
                     }
                 )
             }

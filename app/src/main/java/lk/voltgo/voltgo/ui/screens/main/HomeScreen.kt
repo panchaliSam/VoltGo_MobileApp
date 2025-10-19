@@ -32,8 +32,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import lk.voltgo.voltgo.ui.components.GradientActionCard
 import lk.voltgo.voltgo.ui.theme.AppColors
+import lk.voltgo.voltgo.ui.viewmodel.auth.HomeViewModel
 
 // Main composable for the Home Screen.
 // Displays greeting text, navigation cards, and a profile menu.
@@ -44,7 +46,8 @@ fun HomeScreen(
     onNewReservationClick: () -> Unit,
     onFindStationsClick: () -> Unit,
     onEditProfileClick: () -> Unit,
-    onLogoutClick: () -> Unit,
+    onNavigateToLogin: () -> Unit,
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
     var showProfileMenu by remember { mutableStateOf(false) }
 
@@ -83,7 +86,7 @@ fun HomeScreen(
                                 text = { Text("Logout") },
                                 onClick = {
                                     showProfileMenu = false
-                                    onLogoutClick()
+                                    viewModel.logout(onNavigateToLogin)
                                 }
                             )
                         }
@@ -172,6 +175,6 @@ private fun HomeScreenPreview() {
         onNewReservationClick = {},
         onFindStationsClick = {},
         onEditProfileClick = {},
-        onLogoutClick = {}
+        onNavigateToLogin = {}
     )
 }
