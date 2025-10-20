@@ -15,6 +15,7 @@
 
 package lk.voltgo.voltgo.ui.screens.operator
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -39,7 +40,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import lk.voltgo.voltgo.ui.screens.main.ReservationStatus
 import lk.voltgo.voltgo.ui.screens.main.ReservationUi
-import lk.voltgo.voltgo.ui.screens.main.StatusChip
 import lk.voltgo.voltgo.ui.theme.AppColors
 
 // Main composable for the EV Operator Screen.
@@ -163,6 +163,32 @@ fun EVOperatorScreen(
                 }
             }
         }
+    }
+}
+
+// Small pill showing the reservation status (local to Operator screen)
+@Composable
+private fun StatusChip(status: ReservationStatus) {
+    val (label, bg, fg) = when (status) {
+        ReservationStatus.Confirmed -> Triple("Confirmed", AppColors.ElectricBlue.copy(alpha = 0.10f), AppColors.ElectricBlue)
+        ReservationStatus.Pending   -> Triple("Pending", AppColors.DeepNavy.copy(alpha = 0.08f), AppColors.DeepNavy)
+        ReservationStatus.Completed -> Triple("Completed", Color(0xFFE6F4EA), Color(0xFF1E4620)) // light green bg, dark green text
+        ReservationStatus.Cancelled -> Triple("Cancelled", Color(0xFFFFE8E6), Color(0xFF7A1F1F)) // light red bg, dark red text
+    }
+
+    Surface(
+        shape = RoundedCornerShape(50),
+        color = bg,
+        contentColor = fg,
+        border = BorderStroke(1.dp, fg.copy(alpha = 0.35f))
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+            maxLines = 1,
+            overflow = TextOverflow.Clip
+        )
     }
 }
 

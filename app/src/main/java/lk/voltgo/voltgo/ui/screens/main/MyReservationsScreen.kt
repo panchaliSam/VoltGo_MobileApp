@@ -3,67 +3,58 @@
  * File: MyReservationsScreen.kt
  * Author: Panchali Samarasinghe
  * Created: October 10, 2025
- * Version: 1.0
+ * Version: 1.1
  *
- * Description:
- * This file defines the My Reservations screen of the VoltGo app.
- * It displays a list of the user's EV charging reservations, including
- * details like station name, date/time, and reservation status. Users
- * can view details, cancel confirmed or pending reservations, and see
- * completed or cancelled ones in a well-structured UI.
+ * Change log:
+ *  - Removed dummy data
+ *  - Loads from API via ReservationViewModel
+ *  - Added category filter tabs (All / Confirmed / Pending / Completed / Cancelled)
+ *  - Shows loading & error states
  * ------------------------------------------------------------
  */
-
 package lk.voltgo.voltgo.ui.screens.main
 
-import androidx.compose.foundation.BorderStroke
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.Image
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.hilt.navigation.compose.hiltViewModel
 import lk.voltgo.voltgo.ui.theme.AppColors
+import lk.voltgo.voltgo.ui.viewmodel.main.ReservationFilter
+import lk.voltgo.voltgo.ui.viewmodel.main.ReservationViewModel
 
-// Main composable for displaying all user reservations.
-// Handles the list, empty state, and top app bar navigation.
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyReservationsScreen(
     onBackClick: () -> Unit,
     onViewDetails: (ReservationUi) -> Unit,
-    onCancelReservation: (ReservationUi) -> Unit
+    onCancelReservation: (ReservationUi) -> Unit,
+    viewModel: ReservationViewModel = hiltViewModel()
 ) {
-    val reservations by remember {
-        mutableStateOf(
-            listOf(
-                ReservationUi("#R-1001", "Charge+ Union Place", "2025-10-08", "09:00–10:00", ReservationStatus.Confirmed),
-                ReservationUi("#R-1002", "VoltGo – Kandy City Centre", "2025-10-09", "14:00–15:00", ReservationStatus.Pending),
-                ReservationUi("#R-1003", "GreenCharge – Bambalapitiya", "2025-10-05", "18:30–19:30", ReservationStatus.Completed),
-                ReservationUi("#R-1004", "EVHub – Nugegoda", "2025-10-11", "11:00–12:00", ReservationStatus.Confirmed),
-                ReservationUi("#R-1005", "RapidEV – Malabe", "2025-10-03", "08:00–09:00", ReservationStatus.Cancelled),
-            )
-        )
-    }
-
+    val state by viewModel.state.collectAsState()
     val listState = rememberLazyListState()
+    var qrToShow by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
         containerColor = AppColors.BrandWhite,
@@ -73,13 +64,17 @@ fun MyReservationsScreen(
                     Text(
                         "My Reservations",
                         style = MaterialTheme.typography.titleLarge,
-                        color = AppColors.DeepNavy,
-                        fontWeight = FontWeight.Bold
+                        color = AppColors.DeepNavy
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = AppColors.DeepNavy)
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { viewModel.refresh() }) {
+                        Icon(Icons.Default.Refresh, contentDescription = "Refresh", tint = AppColors.ElectricBlue)
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent)
@@ -92,44 +87,136 @@ fun MyReservationsScreen(
                 .background(AppColors.BrandWhite)
                 .padding(padding)
         ) {
-            if (reservations.isEmpty()) {
-                EmptyState()
-            } else {
-                LazyColumn(
-                    state = listState,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(reservations, key = { it.id }) { res ->
-                        ReservationCard(
-                            res = res,
-                            onClick = { onViewDetails(res) },
-                            onCancel = { onCancelReservation(res) }
-                        )
+            // Filter row
+            FilterTabs(
+                active = state.activeFilter,
+                onSelect = viewModel::setFilter
+            )
+
+            when {
+                state.isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) { CircularProgressIndicator() }
+                }
+                state.error != null -> {
+                    ErrorState(
+                        message = state.error ?: "Something went wrong",
+                        onRetry = { viewModel.refresh() }
+                    )
+                }
+                state.filtered.isEmpty() -> {
+                    EmptyState()
+                }
+                else -> {
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(state.filtered, key = { it.id }) { res ->
+                            ReservationCard(
+                                res = res,
+                                onClick = { onViewDetails(res) },
+                                onCancel = { onCancelReservation(res) },
+                                onShowQr = { qrText -> qrToShow = qrText }
+                            )
+                        }
                     }
                 }
+            }
+            // Show QR dialog if needed
+            if (qrToShow != null) {
+                QrCodeDialog(
+                    qrText = qrToShow!!,
+                    onDismiss = { qrToShow = null }
+                )
             }
         }
     }
 }
 
-/* ---------- Data & UI helpers ---------- */
+/* ---------- Filter Row ---------- */
 
-// Data model representing a single reservation’s details.
-data class ReservationUi(
-    val id: String,
-    val station: String,
-    val date: String,
-    val timeRange: String,
-    val status: ReservationStatus
-)
+@Composable
+private fun FilterTabs(
+    active: ReservationFilter,
+    onSelect: (ReservationFilter) -> Unit
+) {
+    val items = listOf(
+        ReservationFilter.All,
+        ReservationFilter.Confirmed,
+        ReservationFilter.Pending,
+        ReservationFilter.Completed,
+        ReservationFilter.Cancelled
+    )
+    val gradientBorder = Brush.linearGradient(AppColors.splashGradient)
 
-// Enum representing all possible reservation states.
-enum class ReservationStatus { Confirmed, Pending, Completed, Cancelled }
+    ScrollableTabRow(
+        selectedTabIndex = items.indexOf(active),
+        edgePadding = 12.dp,
+        containerColor = Color.Transparent,
+        contentColor = AppColors.DeepNavy,
+        indicator = { /* no underline indicator for a cleaner look */ },
+        divider = {}
+    ) {
+        items.forEachIndexed { index, item ->
+            val selected = index == items.indexOf(active)
+            val shape = RoundedCornerShape(20.dp)
+            Tab(
+                selected = selected,
+                onClick = { onSelect(item) },
+                text = {
+                    Text(
+                        item.name,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = if (selected) AppColors.DeepNavy else AppColors.ElectricBlue
+                    )
+                },
+                modifier = Modifier
+                    .padding(horizontal = 6.dp, vertical = 8.dp)
+                    .then(
+                        if (selected)
+                            Modifier
+                                .border(width = 2.dp, brush = gradientBorder, shape = shape)
+                                .padding(horizontal = 10.dp, vertical = 6.dp)
+                        else Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                    )
+            )
+        }
+    }
+}
 
-// Displays a friendly message when no reservations are available.
+/* ---------- Minimal error/empty states ---------- */
+
+@Composable
+private fun ErrorState(message: String, onRetry: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            "Couldn’t load reservations",
+            style = MaterialTheme.typography.titleMedium,
+            color = AppColors.DeepNavy
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            message,
+            style = MaterialTheme.typography.bodyMedium,
+            color = AppColors.TagCancelledText
+        )
+        Spacer(Modifier.height(16.dp))
+        Button(onClick = onRetry) { Text("Retry") }
+    }
+}
+
 @Composable
 private fun EmptyState() {
     Column(
@@ -142,158 +229,163 @@ private fun EmptyState() {
         Text(
             "No reservations yet",
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
             color = AppColors.DeepNavy
         )
-        Spacer(Modifier.height(6.dp))
+        Spacer(Modifier.height(8.dp))
         Text(
-            "When you book a charging slot, it’ll appear here.",
+            "When you make a reservation, it will appear here.",
             style = MaterialTheme.typography.bodyMedium,
-            color = AppColors.ElectricBlue
+            color = AppColors.TagCancelledText
         )
     }
 }
 
-// Displays a small colored chip indicating the reservation status.
-@Composable
-fun StatusChip(status: ReservationStatus, shape: Shape = CircleShape) {
-    // map to unique tag colors
-    val (bg, text, border) = when (status) {
-        ReservationStatus.Confirmed -> Triple(AppColors.TagConfirmedBg, AppColors.TagConfirmedText, null)
-        ReservationStatus.Pending   -> Triple(AppColors.TagPendingBg, AppColors.TagPendingText, null)
-        ReservationStatus.Completed -> Triple(AppColors.TagCompletedBg, AppColors.TagCompletedText, null)
-        ReservationStatus.Cancelled -> Triple(AppColors.TagCancelledBg, AppColors.TagCancelledText, AppColors.TagCancelledBorder)
-    }
-
-    Box(
-        modifier = Modifier
-            .clip(shape)
-            .then(if (border != null) Modifier.border(BorderStroke(1.dp, border), shape) else Modifier)
-            .background(bg)
-            .padding(horizontal = 10.dp, vertical = 4.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = status.name,
-            style = MaterialTheme.typography.labelMedium,
-            color = text,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-    }
-}
-
-
-// Represents a single reservation item with actions (view, cancel).
 @Composable
 private fun ReservationCard(
     res: ReservationUi,
     onClick: () -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    onShowQr: (String) -> Unit
 ) {
-    val canCancel = res.status == ReservationStatus.Confirmed || res.status == ReservationStatus.Pending
-    var menuOpen by remember { mutableStateOf(false) }
-
+    val shape = RoundedCornerShape(16.dp)
     val gradientBorder = Brush.linearGradient(AppColors.splashGradient)
-    val cardShape = RoundedCornerShape(16.dp)
 
-    Card(
-        onClick = onClick,
+    Surface(
+        shape = shape,
+        tonalElevation = 1.dp,
+        shadowElevation = 2.dp,
         modifier = Modifier
             .fillMaxWidth()
-            .border(
-                width = 2.dp,
-                brush = gradientBorder,
-                shape = cardShape
-            ),
-        shape = cardShape,
-        colors = CardDefaults.cardColors(containerColor = AppColors.BrandWhite),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            .border(1.dp, brush = gradientBorder, shape = shape)
+            .padding(1.dp)
+            .clickable { onClick() }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // Header
+            // Station name
+            Text(
+                text = res.station,
+                style = MaterialTheme.typography.titleMedium,
+                color = AppColors.DeepNavy
+            )
+
+            Spacer(Modifier.height(4.dp))
+
+            // Date & time
+            Text(
+                text = "${res.date} • ${res.timeRange}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = AppColors.ElectricBlue
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            // Status chip + actions
             Row(
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    text = res.station,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = AppColors.DeepNavy,
-                    modifier = Modifier.weight(1f),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                // Status chip
+                val (bg, fg) = when (res.status) {
+                    ReservationStatus.Confirmed -> AppColors.TagConfirmedBg to AppColors.TagConfirmedText
+                    ReservationStatus.Pending   -> AppColors.TagPendingBg to AppColors.TagPendingText
+                    ReservationStatus.Completed -> AppColors.TagCompletedBg to AppColors.TagCompletedText
+                    ReservationStatus.Cancelled -> AppColors.TagCancelledBg to AppColors.TagCancelledText
+                }
+                Surface(
+                    color = bg,
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(
+                        text = res.status.name,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = fg,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                    )
+                }
 
-                Box {
-                    IconButton(onClick = { menuOpen = true }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "More", tint = AppColors.ElectricBlue)
+                Row {
+                    if ((res.status == ReservationStatus.Confirmed || res.status == ReservationStatus.Completed) &&
+                        !res.qrCode.isNullOrBlank()
+                    ) {
+                        TextButton(onClick = { onShowQr(res.qrCode!!) }) {
+                            Text("Show QR")
+                        }
                     }
-                    DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                        DropdownMenuItem(
-                            text = { Text("View details") },
-                            onClick = {
-                                menuOpen = false
-                                onClick()
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Cancel reservation") },
-                            onClick = {
-                                menuOpen = false
-                                onCancel()
-                            },
-                            enabled = canCancel
-                        )
+
+
+                    // Cancel (only for Pending / Confirmed)
+                    if (res.status == ReservationStatus.Pending || res.status == ReservationStatus.Confirmed) {
+                        TextButton(onClick = onCancel) {
+                            Text("Cancel")
+                        }
                     }
                 }
-            }
-
-            Spacer(Modifier.height(6.dp))
-
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = res.date,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AppColors.ElectricBlue,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.weight(1f)
-                )
-                Text(
-                    text = res.timeRange,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AppColors.DeepNavy,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-
-            Spacer(Modifier.height(10.dp))
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = res.id,
-                    style = MaterialTheme.typography.labelLarge,
-                    color = AppColors.ElectricBlue,
-                    modifier = Modifier.weight(1f)
-                )
-                StatusChip(status = res.status)
             }
         }
     }
 }
 
-/* ---------- Preview ---------- */
-
-// Preview function for visualizing the MyReservationsScreen in Android Studio.
-@Preview(showBackground = true, widthDp = 420)
 @Composable
-private fun MyReservationsScreenPreview() {
-    MaterialTheme {
-        MyReservationsScreen(
-            onBackClick = {},
-            onViewDetails = {},
-            onCancelReservation = {}
-        )
+fun QrCodeDialog(
+    qrText: String,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text("Close") }
+        },
+        title = { Text("Reservation QR") },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                val img = remember(qrText) { generateQrBitmap(qrText, 600) }
+                if (img != null) {
+                    Image(
+                        bitmap = img,
+                        contentDescription = "Reservation QR code",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
+                    )
+                } else {
+                    Text(
+                        text = qrText,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = AppColors.TagCancelledText
+                    )
+                }
+            }
+        }
+    )
+}
+
+fun generateQrBitmap(content: String, size: Int = 512): ImageBitmap? {
+    return try {
+        val writer = com.google.zxing.qrcode.QRCodeWriter()
+        val bitMatrix = writer.encode(content, com.google.zxing.BarcodeFormat.QR_CODE, size, size)
+        val bmp = android.graphics.Bitmap.createBitmap(size, size, android.graphics.Bitmap.Config.ARGB_8888)
+        for (x in 0 until size) {
+            for (y in 0 until size) {
+                bmp.setPixel(x, y, if (bitMatrix.get(x, y)) android.graphics.Color.BLACK else android.graphics.Color.WHITE)
+            }
+        }
+        bmp.asImageBitmap()
+    } catch (t: Throwable) {
+        null
     }
 }
+
+data class ReservationUi(
+    val id: String,
+    val station: String,
+    val date: String,
+    val timeRange: String,
+    val status: ReservationStatus,
+    val qrCode: String? = null
+)
+
+enum class ReservationStatus { Confirmed, Pending, Completed, Cancelled }

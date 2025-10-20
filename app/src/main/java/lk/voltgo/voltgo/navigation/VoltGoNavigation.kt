@@ -13,6 +13,8 @@
 
 package lk.voltgo.voltgo.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -30,6 +32,7 @@ import lk.voltgo.voltgo.ui.screens.main.HomeScreen
 import lk.voltgo.voltgo.ui.screens.main.MyReservationsScreen
 import lk.voltgo.voltgo.ui.screens.operator.EVOperatorScreen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 // Sets up the navigation graph for VoltGo app including authentication and main flows
 fun VoltGoNavigation(
