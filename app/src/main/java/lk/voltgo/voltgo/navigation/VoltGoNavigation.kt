@@ -13,14 +13,17 @@
 
 package lk.voltgo.voltgo.navigation
 
+import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import androidx.navigation.navArgument
 import lk.voltgo.voltgo.ui.screens.auth.LoginScreen
 import lk.voltgo.voltgo.ui.screens.auth.OnboardingScreen
 import lk.voltgo.voltgo.ui.screens.auth.RegisterScreen
@@ -30,6 +33,8 @@ import lk.voltgo.voltgo.ui.screens.main.CreateReservationScreen
 import lk.voltgo.voltgo.ui.screens.main.StationsScreen
 import lk.voltgo.voltgo.ui.screens.main.HomeScreen
 import lk.voltgo.voltgo.ui.screens.main.MyReservationsScreen
+import lk.voltgo.voltgo.ui.screens.main.ReservationDetailsScreen
+import lk.voltgo.voltgo.ui.screens.main.UpcomingReservationsScreen
 import lk.voltgo.voltgo.ui.screens.operator.EVOperatorScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -145,6 +150,9 @@ fun VoltGoNavigation(
                     onMyReservationsClick = {
                         navController.navigate(Screen.MyReservations.route)
                     },
+                    onUpcomingReservationsClick = {
+                        navController.navigate(Screen.UpcomingReservations.route)
+                    },
                     onNewReservationClick = {
                         navController.navigate(Screen.NewReservation.route)
                     },
@@ -170,6 +178,23 @@ fun VoltGoNavigation(
                     onCancelReservation = { _ ->
                         // TODO: Handle cancel flow or navigate to a confirmation dialog/screen
                     }
+                )
+            }
+            composable(Screen.UpcomingReservations.route) {
+                UpcomingReservationsScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onViewDetails = { res ->
+                        val encoded = Uri.encode(res.id)
+                        navController.navigate(Screen.reservationDetailsRoute(encoded))
+                    }
+                )
+            }
+            composable(
+                route = "${Screen.ReservationDetails.route}/{reservationId}",
+                arguments = listOf(navArgument("reservationId") { type = NavType.StringType })
+            ) {
+                ReservationDetailsScreen(
+                    onBackClick = { navController.popBackStack() }
                 )
             }
             composable(Screen.NewReservation.route) {

@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Bookmarks
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.EventAvailable
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -43,6 +44,7 @@ import lk.voltgo.voltgo.ui.viewmodel.auth.HomeViewModel
 @Composable
 fun HomeScreen(
     onMyReservationsClick: () -> Unit,
+    onUpcomingReservationsClick : () -> Unit,
     onNewReservationClick: () -> Unit,
     onFindStationsClick: () -> Unit,
     onEditProfileClick: () -> Unit,
@@ -127,6 +129,15 @@ fun HomeScreen(
             )
 
             GradientActionCard(
+                title = "Upcoming Reservations",
+                subtitle = "See your upcoming charging sessions",
+                icon = Icons.Filled.EventAvailable,
+                onClick = onUpcomingReservationsClick,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+
+            GradientActionCard(
                 title = "Create Reservation",
                 subtitle = "Book a charging slot now",
                 icon = Icons.Filled.Edit,
@@ -172,6 +183,7 @@ private fun AssistChipRow(
 private fun HomeScreenPreview() {
     HomeScreen(
         onMyReservationsClick = {},
+        onUpcomingReservationsClick= {},
         onNewReservationClick = {},
         onFindStationsClick = {},
         onEditProfileClick = {},

@@ -1,6 +1,7 @@
 package lk.voltgo.voltgo.data.mapper
 
 import lk.voltgo.voltgo.data.local.entities.ReservationEntity
+import lk.voltgo.voltgo.data.remote.dto.ReservationDetailUi
 import lk.voltgo.voltgo.data.remote.dto.ReservationResponse
 import lk.voltgo.voltgo.data.remote.types.StatusType
 import lk.voltgo.voltgo.ui.screens.main.ReservationStatus
@@ -57,4 +58,31 @@ fun ReservationEntity.toUi(): ReservationUi =
         timeRange = "",                                // fill if you compute from slot
         status    = status.toUiStatus(),
         qrCode    = qrCode
+    )
+
+fun ReservationEntity.toDetailUi(
+    stationNameResolver: (String) -> String = { it } // plug a lookup if you have Station table
+): ReservationDetailUi =
+    ReservationDetailUi(
+        id = reservationId,
+        stationName = stationNameResolver(stationId),
+        stationId = stationId,
+        slotId = slotId,
+        date = reservationDate.substring(0, 10),            // assume you already compute pretty date in toUi()/entity
+        timeRange = "",  // same as above
+        status = when (status.name.lowercase()) {
+            "confirmed" -> ReservationStatus.Confirmed
+            "pending"   -> ReservationStatus.Pending
+            "completed" -> ReservationStatus.Completed
+            "cancelled" -> ReservationStatus.Cancelled
+            else        -> ReservationStatus.Pending
+        },
+        qrCode = qrCode,
+        notes = notes,
+        createdAt = createdAt,
+        confirmedAt = confirmedAt,
+        completedAt = completedAt,
+        cancelledAt = cancelledAt,
+        canBeModified = canBeModified,
+        canBeCancelled = canBeCancelled
     )

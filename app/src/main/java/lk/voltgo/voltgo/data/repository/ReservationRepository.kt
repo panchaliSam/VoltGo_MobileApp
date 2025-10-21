@@ -51,4 +51,25 @@ class ReservationRepository @Inject constructor(
                 Result.success(cached)
             }
         }
+
+    // ReservationRepository.kt (add single-item fetch)
+    suspend fun getReservationById(id: String): Result<ReservationEntity> = withContext(Dispatchers.IO) {
+        try {
+            val resp = reservationApiService.getReservationById(id)
+            if (resp.isSuccessful) {
+                val dto = resp.body() ?: return@withContext Result.failure(IllegalStateException("Empty"))
+                val entity = dto.toEntity()
+                reservationDao.upsertOne(entity)
+                Result.success(entity)
+            } else {
+                // Fallback to cache
+                val cached = reservationDao.getById(id)
+                if (cached != null) Result.success(cached)
+                else Result.failure(IllegalStateException("Not found"))
+            }
+        } catch (e: Exception) {
+            val cached = reservationDao.getById(id)
+            if (cached != null) Result.success(cached) else Result.failure(e)
+        }
+    }
 }

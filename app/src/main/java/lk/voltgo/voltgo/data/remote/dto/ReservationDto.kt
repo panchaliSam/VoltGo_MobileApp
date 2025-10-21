@@ -1,5 +1,7 @@
 package lk.voltgo.voltgo.data.remote.dto
 
+import lk.voltgo.voltgo.ui.screens.main.ReservationStatus
+
 /**
  * ------------------------------------------------------------
  * File: ReservationResponse.kt
@@ -28,4 +30,22 @@ data class ReservationResponse(
     val canBeModified: Boolean,
     val canBeCancelled: Boolean,
     val isWithin7Days: Boolean
+)
+
+data class ReservationDetailUi(
+    val id: String,
+    val stationName: String,
+    val stationId: String,
+    val slotId: String,
+    val date: String,
+    val timeRange: String,
+    val status: ReservationStatus,
+    val qrCode: String?,
+    val notes: String?,
+    val createdAt: String?,
+    val confirmedAt: String?,
+    val completedAt: String?,
+    val cancelledAt: String?,
+    val canBeModified: Boolean,
+    val canBeCancelled: Boolean
 )

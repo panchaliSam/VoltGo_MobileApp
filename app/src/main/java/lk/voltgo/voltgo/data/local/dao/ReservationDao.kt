@@ -26,8 +26,11 @@ interface ReservationDao {
     suspend fun countReservations(): Int
 
     // Retrieves a reservation by its unique ID.
-    @Query("SELECT * FROM reservation WHERE reservation_id = :reservationId")
-    suspend fun getById(reservationId: String): ReservationEntity?
+    @Query("SELECT * FROM reservation WHERE reservation_id = :id LIMIT 1")
+    suspend fun getById(id: String): ReservationEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertOne(entity: ReservationEntity)
 
     // Observes all reservations of a specific owner NIC as a reactive Flow, ordered by date (descending).
     @Query("""
