@@ -12,6 +12,8 @@
  */
 package lk.voltgo.voltgo.auth
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import lk.voltgo.voltgo.data.remote.dto.AuthResponse
 import lk.voltgo.voltgo.data.remote.dto.UpdateProfileRequest
 import lk.voltgo.voltgo.data.remote.dto.UserProfileResponse
@@ -73,4 +75,60 @@ class AuthManager @Inject constructor(
         tokenManager.clearToken()
         return true
     }
+
+    data class TokenClaims(
+        val userId: String? = null,
+        val role: String? = null,
+        val nic: String? = null
+    )
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun decodeClaimsFrom(token: String): TokenClaims {
+        return try {
+            // JWT: header.payload.signature -> we need payload (index 1)
+            val parts = token.split(".")
+            if (parts.size < 2) return TokenClaims()
+
+            fun String.fixPadding(): String {
+                var s = this.replace('-', '+').replace('_', '/')
+                while (s.length % 4 != 0) s += "="
+                return s
+            }
+
+            val payloadBytes = java.util.Base64.getDecoder().decode(parts[1].fixPadding())
+            val json = org.json.JSONObject(String(payloadBytes, Charsets.UTF_8))
+
+            TokenClaims(
+                userId = json.optString("UserId", null),
+                role   = json.optString("Role", null),
+                nic    = json.optString("NIC", null)
+            )
+        } catch (_: Throwable) {
+            TokenClaims()
+        }
+    }
+
+    /** Suspend variant – okay to call from coroutines */
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getCurrentUserId(): String? {
+        val token = authToken ?: tokenManager.getToken()
+        return token?.let { decodeClaimsFrom(it).userId }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getCurrentNIC(): String? {
+        val token = authToken ?: tokenManager.getToken()
+        return token?.let { decodeClaimsFrom(it).nic }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getCurrentRole(): String? {
+        val token = authToken ?: tokenManager.getToken()
+        return token?.let { decodeClaimsFrom(it).role }
+    }
+
+    /** Fast, non-suspend cache-only access (valid right after login) */
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun currentUserIdCached(): String? = authToken?.let { decodeClaimsFrom(it).userId }
+
 }

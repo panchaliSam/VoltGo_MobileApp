@@ -3,22 +3,21 @@
  * File: MyReservationsScreen.kt
  * Author: Panchali Samarasinghe
  * Created: October 10, 2025
- * Version: 1.1
+ * Version: 1.2
  *
  * Change log:
- *  - Removed dummy data
- *  - Loads from API via ReservationViewModel
- *  - Added category filter tabs (All / Confirmed / Pending / Completed / Cancelled)
- *  - Shows loading & error states
+ *  - Match UI style of EVOperatorScreen (cards, gradient borders, status chip, buttons)
+ *  - Keep filters, loading/error/empty states
+ *  - Show QR for Confirmed and Completed (if qrCode != null)
  * ------------------------------------------------------------
  */
 package lk.voltgo.voltgo.ui.screens.main
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -27,18 +26,26 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.Image
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.hilt.navigation.compose.hiltViewModel
+import lk.voltgo.voltgo.ui.components.VoltGoDangerOutlinedButton
+import lk.voltgo.voltgo.ui.components.VoltGoFilterPill
+import lk.voltgo.voltgo.ui.components.VoltGoGradientButton
 import lk.voltgo.voltgo.ui.theme.AppColors
 import lk.voltgo.voltgo.ui.viewmodel.main.ReservationFilter
 import lk.voltgo.voltgo.ui.viewmodel.main.ReservationViewModel
@@ -56,6 +63,9 @@ fun MyReservationsScreen(
     val listState = rememberLazyListState()
     var qrToShow by remember { mutableStateOf<String?>(null) }
 
+    val cardShape = RoundedCornerShape(16.dp)
+    val gradientBorder = Brush.linearGradient(AppColors.splashGradient)
+
     Scaffold(
         containerColor = AppColors.BrandWhite,
         topBar = {
@@ -64,17 +74,20 @@ fun MyReservationsScreen(
                     Text(
                         "My Reservations",
                         style = MaterialTheme.typography.titleLarge,
-                        color = AppColors.DeepNavy
+                        color = AppColors.DeepNavy,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = AppColors.DeepNavy)
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back", tint = AppColors.DeepNavy)
                     }
                 },
                 actions = {
                     IconButton(onClick = { viewModel.refresh() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Refresh", tint = AppColors.ElectricBlue)
+                        Icon(Icons.Filled.Refresh, contentDescription = "Refresh", tint = AppColors.DeepNavy)
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent)
@@ -110,24 +123,54 @@ fun MyReservationsScreen(
                     EmptyState()
                 }
                 else -> {
+                    // Optional header card (mirrors operator header style)
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
+                            .border(2.dp, gradientBorder, cardShape),
+                        shape = cardShape,
+                        colors = CardDefaults.cardColors(containerColor = AppColors.BrandWhite),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                    ) {
+                        Column(Modifier.padding(16.dp)) {
+                            Text(
+                                "Your Reservations",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = AppColors.DeepNavy,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Spacer(Modifier.height(4.dp))
+                            Text(
+                                "View, cancel, or show the QR to station operators.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = AppColors.ElectricBlue
+                            )
+                        }
+                    }
+
                     LazyColumn(
                         state = listState,
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                            .padding(horizontal = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(state.filtered, key = { it.id }) { res ->
-                            ReservationCard(
+                            MyReservationCard(
                                 res = res,
-                                onClick = { onViewDetails(res) },
-                                onCancel = { onCancelReservation(res) },
-                                onShowQr = { qrText -> qrToShow = qrText }
+                                onView = { onViewDetails(res) },
+                                onShowQr = {
+                                    if (!res.qrCode.isNullOrBlank()) qrToShow = res.qrCode
+                                },
+                                onCancel = { onCancelReservation(res) }
                             )
                         }
+                        item { Spacer(Modifier.height(24.dp)) }
                     }
                 }
             }
+
             // Show QR dialog if needed
             if (qrToShow != null) {
                 QrCodeDialog(
@@ -153,44 +196,153 @@ private fun FilterTabs(
         ReservationFilter.Completed,
         ReservationFilter.Cancelled
     )
-    val gradientBorder = Brush.linearGradient(AppColors.splashGradient)
 
-    ScrollableTabRow(
-        selectedTabIndex = items.indexOf(active),
-        edgePadding = 12.dp,
-        containerColor = Color.Transparent,
-        contentColor = AppColors.DeepNavy,
-        indicator = { /* no underline indicator for a cleaner look */ },
-        divider = {}
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items.forEachIndexed { index, item ->
-            val selected = index == items.indexOf(active)
-            val shape = RoundedCornerShape(20.dp)
-            Tab(
-                selected = selected,
-                onClick = { onSelect(item) },
-                text = {
-                    Text(
-                        item.name,
-                        style = MaterialTheme.typography.labelLarge,
-                        color = if (selected) AppColors.DeepNavy else AppColors.ElectricBlue
-                    )
-                },
-                modifier = Modifier
-                    .padding(horizontal = 6.dp, vertical = 8.dp)
-                    .then(
-                        if (selected)
-                            Modifier
-                                .border(width = 2.dp, brush = gradientBorder, shape = shape)
-                                .padding(horizontal = 10.dp, vertical = 6.dp)
-                        else Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-                    )
+        items.forEach { item ->
+            VoltGoFilterPill(
+                text = item.name,
+                selected = item == active,
+                onClick = { onSelect(item) }
             )
         }
     }
 }
 
-/* ---------- Minimal error/empty states ---------- */
+/* ---------- Status chip (styled like EVOperatorScreen) ---------- */
+
+@Composable
+private fun StatusChip(status: ReservationStatus) {
+    val (label, bg, fg) = when (status) {
+        ReservationStatus.Confirmed -> Triple(
+            "Confirmed",
+            AppColors.TagConfirmedBg,
+            AppColors.TagConfirmedText
+        )
+        ReservationStatus.Pending -> Triple(
+            "Pending",
+            AppColors.TagPendingBg,
+            AppColors.TagPendingText
+        )
+        ReservationStatus.Completed -> Triple(
+            "Completed",
+            AppColors.TagCompletedBg,
+            AppColors.TagCompletedText
+        )
+        ReservationStatus.Cancelled -> Triple(
+            "Cancelled",
+            AppColors.TagCancelledBg,
+            AppColors.TagCancelledText
+        )
+    }
+
+    Surface(
+        shape = RoundedCornerShape(50),
+        color = bg,
+        contentColor = fg,
+        border = BorderStroke(1.dp, fg.copy(alpha = 0.35f))
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+            maxLines = 1,
+            overflow = TextOverflow.Clip
+        )
+    }
+}
+
+/* ---------- Item card (mirrors OperatorReservationCard styling) ---------- */
+
+@Composable
+private fun MyReservationCard(
+    res: ReservationUi,
+    onView: () -> Unit,
+    onShowQr: () -> Unit,
+    onCancel: () -> Unit
+) {
+    val cardShape = RoundedCornerShape(16.dp)
+    val gradientBorder = Brush.linearGradient(AppColors.splashGradient)
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(2.dp, gradientBorder, cardShape),
+        shape = cardShape,
+        colors = CardDefaults.cardColors(containerColor = AppColors.BrandWhite),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            // Top row: Station name + status
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = res.station,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = AppColors.DeepNavy,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.weight(1f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                StatusChip(status = res.status)
+            }
+
+            Spacer(Modifier.height(6.dp))
+
+            // ID + Date/Time
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = res.id,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = AppColors.ElectricBlue,
+                    modifier = Modifier.weight(1f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = "${res.date}  •  ${res.timeRange}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = AppColors.DeepNavy
+                )
+            }
+
+            Spacer(Modifier.height(10.dp))
+
+            // Actions
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                val canShowQr = (res.status == ReservationStatus.Confirmed || res.status == ReservationStatus.Completed) &&
+                        !res.qrCode.isNullOrBlank()
+
+                if (canShowQr) {
+                    VoltGoGradientButton(
+                        text = "Show QR",
+                        leadingIcon = Icons.Outlined.QrCodeScanner,
+                        onClick = onShowQr,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                if (res.status == ReservationStatus.Pending || res.status == ReservationStatus.Confirmed) {
+                    VoltGoDangerOutlinedButton(
+                        text = "Cancel",
+                        onClick = onCancel,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+        }
+    }
+}
+
+/* ---------- Error/Empty states (colors preserved) ---------- */
 
 @Composable
 private fun ErrorState(message: String, onRetry: () -> Unit) {
@@ -204,7 +356,8 @@ private fun ErrorState(message: String, onRetry: () -> Unit) {
         Text(
             "Couldn’t load reservations",
             style = MaterialTheme.typography.titleMedium,
-            color = AppColors.DeepNavy
+            color = AppColors.DeepNavy,
+            fontWeight = FontWeight.SemiBold
         )
         Spacer(Modifier.height(8.dp))
         Text(
@@ -213,7 +366,10 @@ private fun ErrorState(message: String, onRetry: () -> Unit) {
             color = AppColors.TagCancelledText
         )
         Spacer(Modifier.height(16.dp))
-        Button(onClick = onRetry) { Text("Retry") }
+        VoltGoGradientButton(
+            text = "Retry",
+            onClick = onRetry
+        )
     }
 }
 
@@ -229,102 +385,19 @@ private fun EmptyState() {
         Text(
             "No reservations yet",
             style = MaterialTheme.typography.titleMedium,
-            color = AppColors.DeepNavy
+            color = AppColors.DeepNavy,
+            fontWeight = FontWeight.SemiBold
         )
         Spacer(Modifier.height(8.dp))
         Text(
             "When you make a reservation, it will appear here.",
             style = MaterialTheme.typography.bodyMedium,
-            color = AppColors.TagCancelledText
+            color = AppColors.ElectricBlue
         )
     }
 }
 
-@Composable
-private fun ReservationCard(
-    res: ReservationUi,
-    onClick: () -> Unit,
-    onCancel: () -> Unit,
-    onShowQr: (String) -> Unit
-) {
-    val shape = RoundedCornerShape(16.dp)
-    val gradientBorder = Brush.linearGradient(AppColors.splashGradient)
-
-    Surface(
-        shape = shape,
-        tonalElevation = 1.dp,
-        shadowElevation = 2.dp,
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(1.dp, brush = gradientBorder, shape = shape)
-            .padding(1.dp)
-            .clickable { onClick() }
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            // Station name
-            Text(
-                text = res.station,
-                style = MaterialTheme.typography.titleMedium,
-                color = AppColors.DeepNavy
-            )
-
-            Spacer(Modifier.height(4.dp))
-
-            // Date & time
-            Text(
-                text = "${res.date} • ${res.timeRange}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = AppColors.ElectricBlue
-            )
-
-            Spacer(Modifier.height(8.dp))
-
-            // Status chip + actions
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                // Status chip
-                val (bg, fg) = when (res.status) {
-                    ReservationStatus.Confirmed -> AppColors.TagConfirmedBg to AppColors.TagConfirmedText
-                    ReservationStatus.Pending   -> AppColors.TagPendingBg to AppColors.TagPendingText
-                    ReservationStatus.Completed -> AppColors.TagCompletedBg to AppColors.TagCompletedText
-                    ReservationStatus.Cancelled -> AppColors.TagCancelledBg to AppColors.TagCancelledText
-                }
-                Surface(
-                    color = bg,
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text(
-                        text = res.status.name,
-                        style = MaterialTheme.typography.labelLarge,
-                        color = fg,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
-                    )
-                }
-
-                Row {
-                    if ((res.status == ReservationStatus.Confirmed || res.status == ReservationStatus.Completed) &&
-                        !res.qrCode.isNullOrBlank()
-                    ) {
-                        TextButton(onClick = { onShowQr(res.qrCode!!) }) {
-                            Text("Show QR")
-                        }
-                    }
-
-
-                    // Cancel (only for Pending / Confirmed)
-                    if (res.status == ReservationStatus.Pending || res.status == ReservationStatus.Confirmed) {
-                        TextButton(onClick = onCancel) {
-                            Text("Cancel")
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+/* ---------- QR dialog & generator (unchanged, colors preserved) ---------- */
 
 @Composable
 fun QrCodeDialog(
@@ -378,6 +451,8 @@ fun generateQrBitmap(content: String, size: Int = 512): ImageBitmap? {
         null
     }
 }
+
+/* ---------- Models ---------- */
 
 data class ReservationUi(
     val id: String,

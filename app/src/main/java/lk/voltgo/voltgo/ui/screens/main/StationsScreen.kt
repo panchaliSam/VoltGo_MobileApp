@@ -66,14 +66,18 @@ fun StationsScreen(
         else stations.filter { it.name.contains(searchQuery, ignoreCase = true) }
     }
 
-    // Focus camera when only one station matches search (unchanged)
+    // Focus camera when only one station matches search (null-safe version)
     LaunchedEffect(filteredStations.size) {
         if (filteredStations.size == 1) {
-            val st = filteredStations.first()
-            cameraPositionState.position = CameraPosition.fromLatLngZoom(
-                LatLng(st.latitude, st.longitude), 13f
-            )
-            selectedStation.value = LatLng(st.latitude, st.longitude)
+            val stWithCoords = filteredStations.firstOrNull { it.latitude != null && it.longitude != null }
+            stWithCoords?.let { st ->
+                val lat = st.latitude!!
+                val lng = st.longitude!!
+                cameraPositionState.position = CameraPosition.fromLatLngZoom(
+                    LatLng(lat, lng), 13f
+                )
+                selectedStation.value = LatLng(lat, lng)
+            }
         }
     }
 
@@ -146,13 +150,17 @@ fun StationsScreen(
                         properties = MapProperties(isMyLocationEnabled = false)
                     ) {
                         filteredStations.forEach { st ->
-                            Marker(
-                                state = MarkerState(
-                                    position = LatLng(st.latitude, st.longitude)
-                                ),
-                                title = st.name,
-                                snippet = st.type
-                            )
+                            val lat = st.latitude
+                            val lng = st.longitude
+                            if (lat != null && lng != null) {
+                                Marker(
+                                    state = MarkerState(
+                                        position = LatLng(lat, lng)
+                                    ),
+                                    title = st.name,
+                                    snippet = st.type
+                                )
+                            }
                         }
                     }
                 }

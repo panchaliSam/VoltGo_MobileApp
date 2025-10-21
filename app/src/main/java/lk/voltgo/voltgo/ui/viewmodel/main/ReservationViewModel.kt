@@ -1,33 +1,22 @@
 package lk.voltgo.voltgo.ui.viewmodel.main
 
-/**
- * ------------------------------------------------------------
- * File: ReservationViewModel.kt
- * Author: Panchali Samarasinghe
- * Created: October 20, 2025
- * Version: 1.0
- *
- * Description:
- *  ViewModel that loads reservations from the API via the repository,
- *  maps them to UI models, and filters by status category.
- * ------------------------------------------------------------
- */
-
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.collectLatest
+import lk.voltgo.voltgo.auth.AuthManager
 import lk.voltgo.voltgo.data.mapper.toUi
 import lk.voltgo.voltgo.data.repository.ReservationRepository
 import lk.voltgo.voltgo.ui.screens.main.ReservationStatus
 import lk.voltgo.voltgo.ui.screens.main.ReservationUi
 import java.time.Instant
+import javax.inject.Inject
 
 enum class ReservationFilter { All, Confirmed, Pending, Completed, Cancelled }
 
@@ -43,25 +32,43 @@ data class ReservationsUiState(
 @RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
 class ReservationViewModel @Inject constructor(
-    private val repo: ReservationRepository
+    private val repo: ReservationRepository,
+    private val authManager: AuthManager
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(ReservationsUiState(isLoading = true))
+    private val _state = MutableStateFlow(ReservationsUiState(isLoading = false))
     val state: StateFlow<ReservationsUiState> = _state
 
+    // DO NOT call suspend funcs at init time; load NIC asynchronously.
+    private var currentOwnerNic: String? = null
+
     init {
-        refresh()
+        viewModelScope.launch {
+            currentOwnerNic = authManager.getCurrentNIC()
+        }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun refresh() {
+    fun refresh(ownerNic: String? = null) {
+        val nic = ownerNic ?: currentOwnerNic
+
+        if (nic.isNullOrBlank()) {
+            _state.update { it.copy(isLoading = false, error = "Invalid Owner NIC") }
+            return
+        }
+
+        currentOwnerNic = nic
         _state.update { it.copy(isLoading = true, error = null) }
+
         viewModelScope.launch {
-            val result = repo.getMyReservations()
-            result
-                .onSuccess { list ->
-                    val uiList = list.map { it.toUi() }
-                        .sortedBy { it.date + it.timeRange } // simple stable ordering
+            try {
+                // Sync from remote -> upsert to Room (assumes you implemented this)
+                repo.syncMyReservations(nic)
+
+                // Re-collect latest stream and map to UI
+                repo.observeMyReservations(nic).collectLatest { entities ->
+                    val uiList = entities.map { it.toUi() }
+                        .sortedBy { it.date + it.timeRange } // stable sort key for display
+
                     _state.update { s ->
                         val filtered = applyFilter(uiList, s.activeFilter)
                         s.copy(
@@ -73,9 +80,9 @@ class ReservationViewModel @Inject constructor(
                         )
                     }
                 }
-                .onFailure { e ->
-                    _state.update { it.copy(isLoading = false, error = e.message ?: "Failed to load reservations") }
-                }
+            } catch (e: Exception) {
+                _state.update { it.copy(isLoading = false, error = e.message ?: "Unknown error") }
+            }
         }
     }
 

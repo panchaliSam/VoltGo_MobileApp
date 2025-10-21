@@ -5,9 +5,9 @@
  * Date: 2025-10-10
  *
  * Description:
- * This composable component displays a gradient-styled action card with a title, optional subtitle,
- * and an optional icon. It supports click handling and customizable gradient backgrounds, designed
- * for interactive actions or navigation in the VoltGo app UI.
+ * This composable component displays a solid Electric Blue action card
+ * with a title, optional subtitle, and an optional icon.
+ * It supports click handling and consistent VoltGo styling.
  * ------------------------------------------------------------
  */
 
@@ -16,8 +16,6 @@ package lk.voltgo.voltgo.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -26,14 +24,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import lk.voltgo.voltgo.ui.theme.AppColors
 
-// Composable function that creates a clickable gradient card with title, subtitle, and optional icon.
 @Composable
 fun GradientActionCard(
     title: String,
@@ -41,7 +37,6 @@ fun GradientActionCard(
     icon: ImageVector? = null,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    gradient: List<Color> = AppColors.buttonGradient,
 ) {
     Surface(
         modifier = modifier
@@ -55,7 +50,7 @@ fun GradientActionCard(
         Box(
             modifier = Modifier
                 .background(
-                    brush = Brush.horizontalGradient(gradient),
+                    color = AppColors.ElectricBlue,
                     shape = MaterialTheme.shapes.large
                 )
                 .padding(20.dp)
@@ -90,7 +85,7 @@ fun GradientActionCard(
                         Text(
                             text = subtitle,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = AppColors.TranslucentWhite90
+                            color = AppColors.TranslucentWhite85
                         )
                     }
                 }
