@@ -56,12 +56,12 @@ import lk.voltgo.voltgo.ui.viewmodel.main.ReservationViewModel
 fun MyReservationsScreen(
     onBackClick: () -> Unit,
     onViewDetails: (ReservationUi) -> Unit,
-    onCancelReservation: (ReservationUi) -> Unit,
     viewModel: ReservationViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
     val listState = rememberLazyListState()
     var qrToShow by remember { mutableStateOf<String?>(null) }
+    var showCancelDialog by remember { mutableStateOf<String?>(null) }
 
     val cardShape = RoundedCornerShape(16.dp)
     val gradientBorder = Brush.linearGradient(AppColors.splashGradient)
@@ -163,7 +163,9 @@ fun MyReservationsScreen(
                                 onShowQr = {
                                     if (!res.qrCode.isNullOrBlank()) qrToShow = res.qrCode
                                 },
-                                onCancel = { onCancelReservation(res) }
+                                onCancel = {
+                                    showCancelDialog = res.id
+                                }
                             )
                         }
                         item { Spacer(Modifier.height(24.dp)) }
@@ -176,6 +178,30 @@ fun MyReservationsScreen(
                 QrCodeDialog(
                     qrText = qrToShow!!,
                     onDismiss = { qrToShow = null }
+                )
+            }
+
+            // --- Confirmation dialog ---
+            if (showCancelDialog != null) {
+                AlertDialog(
+                    onDismissRequest = { showCancelDialog = null },
+                    title = { Text("Cancel Reservation") },
+                    text = { Text("Are you sure you want to cancel this reservation? This action cannot be undone.") },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                viewModel.cancelReservation(showCancelDialog!!)
+                                showCancelDialog = null
+                            }
+                        ) {
+                            Text("Yes, Cancel", color = AppColors.TagCancelledText)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showCancelDialog = null }) {
+                            Text("No", color = AppColors.DeepNavy)
+                        }
+                    }
                 )
             }
         }

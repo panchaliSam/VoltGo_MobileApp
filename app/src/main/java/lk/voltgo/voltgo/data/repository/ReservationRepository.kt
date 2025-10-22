@@ -1,6 +1,8 @@
 // ReservationRepository.kt
 package lk.voltgo.voltgo.data.repository
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import lk.voltgo.voltgo.data.local.dao.ReservationDao
@@ -9,6 +11,9 @@ import lk.voltgo.voltgo.data.mapper.toEntity
 import lk.voltgo.voltgo.data.remote.api.ReservationApiService
 import lk.voltgo.voltgo.data.remote.dto.NewReservationRequest
 import lk.voltgo.voltgo.data.remote.dto.NewReservationResponse
+import lk.voltgo.voltgo.data.remote.types.StatusType
+import java.time.Instant
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -88,4 +93,20 @@ class ReservationRepository @Inject constructor(
                 Result.failure(e)
             }
         }
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun cancelReservation(reservationId: String): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val resp = reservationApiService.cancelReservation(reservationId)
+            if (resp.isSuccessful) {
+                // Update local DB
+                val nowIso = DateTimeFormatter.ISO_INSTANT.format(Instant.now())
+                reservationDao.updateStatus(reservationId, StatusType.Cancelled, nowIso)
+                Result.success(Unit)
+            } else {
+                Result.failure(IllegalStateException("Cancel failed: HTTP ${resp.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

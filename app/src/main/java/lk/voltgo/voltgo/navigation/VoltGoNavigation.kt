@@ -176,9 +176,6 @@ fun VoltGoNavigation(
                     onViewDetails = { _ ->
                         // TODO: Navigate to reservation details when that screen exists
                         // navController.navigate(Screen.ReservationDetails.route)
-                    },
-                    onCancelReservation = { _ ->
-                        // TODO: Handle cancel flow or navigate to a confirmation dialog/screen
                     }
                 )
             }
