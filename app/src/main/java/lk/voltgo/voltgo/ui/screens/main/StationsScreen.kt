@@ -25,9 +25,9 @@ import lk.voltgo.voltgo.ui.viewmodel.main.StationViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StationsScreen(
-    navController: NavHostController? = null,
-    viewModel: StationViewModel = hiltViewModel(),
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onStationClick: (String) -> Unit = {},
+    viewModel: StationViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -119,14 +119,14 @@ fun StationsScreen(
                         properties = MapProperties(isMyLocationEnabled = false)
                     ) {
                         filteredStations.forEach { st ->
+                            val latLng = LatLng(st.latitude ?: 0.0, st.longitude ?: 0.0)
                             MarkerInfoWindow(
-                                state = MarkerState(
-                                    position = LatLng(st.latitude?: 0.0, st.longitude?: 0.0)
-                                ),
+                                state = MarkerState(position = latLng),
                                 title = st.name,
                                 snippet = st.location,
-                                onInfoWindowClick = {
-                                    navController?.navigate("stationDetail/${st.id}")
+                                onClick = {
+                                    onStationClick(st.id)
+                                    true
                                 }
                             ) { _ ->
                                 Column(
@@ -134,11 +134,7 @@ fun StationsScreen(
                                         .background(Color.White)
                                         .padding(6.dp)
                                 ) {
-                                    Text(
-                                        text = st.name,
-                                        color = Color.Black,
-                                        fontWeight = FontWeight.Bold
-                                    )
+                                    Text(text = st.name, color = Color.Black, fontWeight = FontWeight.Bold)
                                 }
                             }
                         }

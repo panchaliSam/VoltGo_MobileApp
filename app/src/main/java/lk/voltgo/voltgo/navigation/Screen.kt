@@ -28,6 +28,8 @@ sealed class Screen(val route: String) {
     data object Stations : Screen("stations")
     data object UpcomingReservations : Screen("upcoming_reservations")
     data object ReservationDetails : Screen("reservation_details")
+    data object SlotDetails : Screen("station_details")
+    data object SlotPicker : Screen("slot_picker")
 
     // Operator Flow Screens
     data object OperatorHome : Screen("operator_home")
@@ -35,6 +37,16 @@ sealed class Screen(val route: String) {
     companion object {
         fun reservationDetailsRoute(id: String) =
             "${ReservationDetails.route}/$id"
+
+        fun slotDetailsRoute(id: String) =
+            "${SlotDetails.route}/$id"
+
+        fun slotPickerRoute(stationId: String) =
+            "${SlotPicker.route}/$stationId"
+
+        // Navigate to next page with both IDs
+        fun reservationCreateRoute(stationId: String, slotId: String, reservationDateIso: String) =
+            "${NewReservation.route}/${stationId}/${slotId}/${reservationDateIso}"
     }
 }
 
