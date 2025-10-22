@@ -46,4 +46,8 @@ interface AuthApiService {
     suspend fun updateProfile(
         @Body request: UpdateProfileRequest
     ): Response<MessageResponse>
+
+    @PATCH("/api/auth/deactivate")
+    suspend fun deactivateAccount(
+    ): Response<MessageResponse>
 }

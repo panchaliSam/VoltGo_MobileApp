@@ -18,10 +18,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import lk.voltgo.voltgo.auth.AuthManager
+import lk.voltgo.voltgo.data.repository.UserRepository
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val authManager: AuthManager
+    private val authManager: AuthManager,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     /** Logs out the current user by clearing token from AuthManager and DataStore */
@@ -29,6 +31,25 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             authManager.logout()
             onLoggedOut() // navigate to login screen
+        }
+    }
+    fun deactivateAndLogout(
+        onLoggedOut: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val result = userRepository.deactivateMe()
+                if (result.isSuccess) {
+                    authManager.logout()
+                    onLoggedOut()
+                } else {
+                    val message = result.exceptionOrNull()?.message ?: "Failed to deactivate"
+                    onError(message)
+                }
+            } catch (e: Exception) {
+                onError(e.message ?: "Unexpected error during deactivation")
+            }
         }
     }
 }

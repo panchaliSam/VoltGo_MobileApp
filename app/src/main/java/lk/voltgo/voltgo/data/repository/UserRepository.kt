@@ -129,5 +129,17 @@ class UserRepository @Inject constructor(
         Result.failure(e)
     }
 
+    suspend fun deactivateMe(): Result<Unit> = try {
+        val resp = authApiService.deactivateAccount()
+        if (resp.isSuccessful) {
+            // Reflect locally regardless of who is logged in, as requested.
+            userDao.deactivateAllUsers()
+            Result.success(Unit)
+        } else {
+            Result.failure(Exception("Deactivate failed: ${resp.code()} ${resp.message()}"))
+        }
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
 
 }

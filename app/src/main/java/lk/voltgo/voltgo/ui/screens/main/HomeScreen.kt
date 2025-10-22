@@ -52,6 +52,8 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     var showProfileMenu by remember { mutableStateOf(false) }
+    var showDeactivateDialog by remember { mutableStateOf(false) }
+    var isProcessing by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -82,6 +84,13 @@ fun HomeScreen(
                                 onClick = {
                                     showProfileMenu = false
                                     onEditProfileClick()
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Deactivate Account") },
+                                onClick = {
+                                    showProfileMenu = false
+                                    showDeactivateDialog = true
                                 }
                             )
                             DropdownMenuItem(
@@ -153,8 +162,28 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Add more actions later if needed...
-            // Add more actions later if needed...
+            if (showDeactivateDialog) {
+                DeactivateAccountDialog(
+                    onDismiss = { showDeactivateDialog = false },
+                    onConfirm = {
+                        // user accepted terms
+                        isProcessing = true
+                        viewModel.deactivateAndLogout(
+                            onLoggedOut = {
+                                isProcessing = false
+                                showDeactivateDialog = false
+                                onNavigateToLogin()
+                            },
+                            onError = { err ->
+                                isProcessing = false
+                                // optional: show a snackbar/toast; for now we just close the dialog
+                                showDeactivateDialog = false
+                            }
+                        )
+                    },
+                    processing = isProcessing
+                )
+            }
         }
     }
 }
@@ -175,6 +204,59 @@ private fun AssistChipRow(
             label = { Text("Create Reservation") }
         )
     }
+}
+
+@Composable
+private fun DeactivateAccountDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+    processing: Boolean
+) {
+    var agreed by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        onDismissRequest = { if (!processing) onDismiss() },
+        title = { Text("Deactivate your account?") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    "Deactivating your account will disable your access to VoltGo. " +
+                            "To reactivate, you must contact a back-office operator. " +
+                            "Your existing reservations remain in the system but you won’t be able to use the app until reactivated."
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = agreed,
+                        onCheckedChange = { if (!processing) agreed = it },
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = AppColors.DeepNavy
+                        )
+                    )
+                    Text(
+                        "I understand I’ll need a back-office operator to reactivate my account.",
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onConfirm,
+                enabled = agreed && !processing
+            ) {
+                if (processing) {
+                    CircularProgressIndicator(strokeWidth = 2.dp, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(8.dp))
+                }
+                Text("Yes, deactivate")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { if (!processing) onDismiss() }, enabled = !processing) {
+                Text("Cancel")
+            }
+        }
+    )
 }
 
 // Preview function for displaying the Home Screen in Android Studio’s preview mode.
