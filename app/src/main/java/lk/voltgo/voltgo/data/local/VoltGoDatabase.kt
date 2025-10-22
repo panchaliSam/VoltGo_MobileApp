@@ -27,7 +27,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import lk.voltgo.voltgo.data.local.seeders.ChargingStationSeeder
-import lk.voltgo.voltgo.data.local.seeders.SlotSeeder
 
 @Database(
     entities = [

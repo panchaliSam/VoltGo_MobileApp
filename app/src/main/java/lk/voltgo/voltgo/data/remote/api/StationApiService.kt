@@ -22,10 +22,11 @@ import lk.voltgo.voltgo.data.remote.dto.StationDto
 interface StationApiService {
 
     // Fetches the complete list of all charging stations from the backend.
-    @GET("/api/stations")
+    @GET("/api/Station")
     suspend fun getAllStations(): Response<List<StationDto>>
 
     // Fetches the details of a specific charging station by its unique ID.
     @GET("/api/stations/{id}")
     suspend fun getStationById(@Path("id") id: String): Response<StationDto>
+
 }
