@@ -18,28 +18,28 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import java.sql.Date
 
-@Entity(
-    tableName = "slot",
-)
-
-// Room Entity representing a charging slot record in the local database.
+@Entity(tableName = "slot")
 data class SlotEntity(
-    // Primary key uniquely identifying each slot record.
     @PrimaryKey
     @ColumnInfo(name = "slot_id")
     val slotId: String,
 
-    // Column for the slot's start time (ISO8601 UTC recommended).
     @ColumnInfo(name = "start_time")
-    val startTime: String,         // ISO8601 UTC recommended
+    val startTime: String, // ISO 8601 datetime string
 
-    // Column for the slot's end time (ISO8601 UTC recommended).
     @ColumnInfo(name = "end_time")
-    val endTime: String,           // ISO8601 UTC recommended
+    val endTime: String, // ISO 8601 datetime string
 
-    // Column for the reservation date associated with this slot.
     @ColumnInfo(name = "reservation_date")
-    val reservationDate: String
+    val reservationDate: String, // ISO 8601 date string
 
+    @ColumnInfo(name = "description")
+    val description: String,
+
+    @ColumnInfo(name = "is_available")
+    val isAvailable: Boolean,
+
+    @ColumnInfo(name = "station_id")
+    val stationId: String
 )
 
