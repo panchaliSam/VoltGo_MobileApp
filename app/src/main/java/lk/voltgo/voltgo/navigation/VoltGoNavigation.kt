@@ -116,29 +116,11 @@ fun VoltGoNavigation(
         ) {
             composable(Screen.OperatorHome.route) {
                 // You can fetch this from a ViewModel; hardcoded here for clarity
-                val stationName = "Downtown SuperCharge"
+                val stationName = "VoltGo ⚡"
 
                 EVOperatorScreen(
                     stationName = stationName,
-                    onBackClick = { navController.popBackStack() },
-                    onRefresh = {
-                        // TODO: trigger refresh (e.g., viewModel.refreshOperatorData())
-                    },
-                    onViewReservation = { res ->
-                        // Navigate to reservation details
-                        // TODO: trigger refresh (e.g., viewModel.refreshOperatorData())
-                        //navController.navigate("${Screen.ReservationDetails.route}/${res.id}")
-                    },
-                    onScanQrFor = { res ->
-                        // Open scanner initialized for a specific reservation
-                        // TODO: trigger refresh (e.g., viewModel.refreshOperatorData())
-                        //navController.navigate("${Screen.QRScanner.route}?reservationId=${res.id}")
-                    },
-                    onQuickScan = {
-                        // Open generic scanner
-                        // TODO: trigger refresh (e.g., viewModel.refreshOperatorData())
-                        //navController.navigate(Screen.QRScanner.route)
-                    }
+                    onBackClick = { navController.popBackStack() }
                 )
             }
         }
