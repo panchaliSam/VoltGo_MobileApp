@@ -49,3 +49,15 @@ data class ReservationDetailUi(
     val canBeModified: Boolean,
     val canBeCancelled: Boolean
 )
+
+data class NewReservationRequest(
+    val stationId: String,
+    val slotId: String,
+    val reservationDate: String,
+    val notes: String?
+)
+
+data class NewReservationResponse(
+    val message: String,
+    val bookingId: String
+)

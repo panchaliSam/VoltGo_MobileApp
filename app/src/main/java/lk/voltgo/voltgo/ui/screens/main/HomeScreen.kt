@@ -145,15 +145,6 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-
-            GradientActionCard(
-                title = "Create Reservation",
-                subtitle = "Book a charging slot now",
-                icon = Icons.Filled.Edit,
-                onClick = onNewReservationClick,
-                modifier = Modifier.fillMaxWidth()
-            )
-
             GradientActionCard(
                 title = "Find Stations",
                 subtitle = "Discover nearby chargers & availability",

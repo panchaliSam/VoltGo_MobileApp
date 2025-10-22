@@ -26,7 +26,7 @@ interface StationApiService {
     suspend fun getAllStations(): Response<List<StationDto>>
 
     // Fetches the details of a specific charging station by its unique ID.
-    @GET("/api/stations/{id}")
+    @GET("/api/Station/{id}")
     suspend fun getStationById(@Path("id") id: String): Response<StationDto>
 
 }
