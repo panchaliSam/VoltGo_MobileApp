@@ -34,6 +34,8 @@ import lk.voltgo.voltgo.ui.screens.main.StationsScreen
 import lk.voltgo.voltgo.ui.screens.main.HomeScreen
 import lk.voltgo.voltgo.ui.screens.main.MyReservationsScreen
 import lk.voltgo.voltgo.ui.screens.main.ReservationDetailsScreen
+import lk.voltgo.voltgo.ui.screens.main.SlotDetailScreen
+import lk.voltgo.voltgo.ui.screens.main.SlotPickerScreen
 import lk.voltgo.voltgo.ui.screens.main.UpcomingReservationsScreen
 import lk.voltgo.voltgo.ui.screens.operator.EVOperatorScreen
 
@@ -197,13 +199,20 @@ fun VoltGoNavigation(
                     onBackClick = { navController.popBackStack() }
                 )
             }
-            composable(Screen.NewReservation.route) {
-                // Create Reservation Screen - allows user to create a new reservation
+            composable(
+                route = "${Screen.NewReservation.route}/{stationId}/{slotId}/{reservationDateIso}",
+                arguments = listOf(
+                    navArgument("stationId") { type = NavType.StringType },
+                    navArgument("slotId") { type = NavType.StringType },
+                    navArgument("reservationDateIso") { type = NavType.StringType },
+                )
+            ) {
                 CreateReservationScreen(
                     onBackClick = { navController.popBackStack() },
-                    onOpenMap = { navController.popBackStack() },
-                    onSubmit = { _ ->
-                        // TODO: Handle cancel flow or navigate to a confirmation dialog/screen
+                    onSuccess = { bookingId ->
+                        // Navigate wherever you want after success (e.g., details or list)
+                        // navController.navigate(Screen.reservationDetailsRoute(bookingId))
+                        navController.popBackStack() // simple: go back
                     }
                 )
             }
@@ -211,6 +220,35 @@ fun VoltGoNavigation(
                 // Stations Screen - displays available charging stations on map
                 StationsScreen(
                     onBackClick = { navController.popBackStack() },
+                    onStationClick = { stationId ->
+                        val encoded = Uri.encode(stationId)
+                        navController.navigate(Screen.slotDetailsRoute(encoded))
+                    }
+                )
+            }
+            composable(
+                route = "${Screen.SlotDetails.route}/{stationId}",
+                arguments = listOf(navArgument("stationId") { type = NavType.StringType })
+            ) {
+                SlotDetailScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onReserve = { stationId ->
+                        navController.navigate(Screen.slotPickerRoute(Uri.encode(stationId)))
+                    }
+                )
+            }
+            composable(
+                route = "${Screen.SlotPicker.route}/{stationId}",
+                arguments = listOf(navArgument("stationId") { type = NavType.StringType })
+            ) {
+                SlotPickerScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onSelect = { stationId, slotId, reservationDateIso ->
+                        val s = Uri.encode(stationId)
+                        val sl = Uri.encode(slotId)
+                        val d = Uri.encode(reservationDateIso)
+                        navController.navigate("${Screen.NewReservation.route}/$s/$sl/$d")
+                    }
                 )
             }
             composable(Screen.Profile.route) {

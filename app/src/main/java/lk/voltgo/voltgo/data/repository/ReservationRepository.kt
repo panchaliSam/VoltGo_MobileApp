@@ -7,6 +7,8 @@ import lk.voltgo.voltgo.data.local.dao.ReservationDao
 import lk.voltgo.voltgo.data.local.entities.ReservationEntity
 import lk.voltgo.voltgo.data.mapper.toEntity
 import lk.voltgo.voltgo.data.remote.api.ReservationApiService
+import lk.voltgo.voltgo.data.remote.dto.NewReservationRequest
+import lk.voltgo.voltgo.data.remote.dto.NewReservationResponse
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -72,4 +74,18 @@ class ReservationRepository @Inject constructor(
             if (cached != null) Result.success(cached) else Result.failure(e)
         }
     }
+
+    suspend fun createReservation(request: NewReservationRequest): Result<NewReservationResponse> =
+        withContext(Dispatchers.IO) {
+            try {
+                val resp = reservationApiService.createReservation(request)
+                if (resp.isSuccessful) {
+                    Result.success(resp.body() ?: NewReservationResponse("OK", bookingId = ""))
+                } else {
+                    Result.failure(IllegalStateException("Create failed: HTTP ${resp.code()}"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
 }
