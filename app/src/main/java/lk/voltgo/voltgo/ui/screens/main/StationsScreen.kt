@@ -51,9 +51,9 @@ fun StationsScreen(
         if (filteredStations.size == 1) {
             val st = filteredStations.first()
             cameraPositionState.position = CameraPosition.fromLatLngZoom(
-                LatLng(st.latitude, st.longitude), 13f
+                LatLng(st.latitude ?: 0.0, st.longitude?: 0.0), 13f
             )
-            selectedStation.value = LatLng(st.latitude, st.longitude)
+            selectedStation.value = LatLng(st.latitude?: 0.0, st.longitude?: 0.0)
         } else {
             cameraPositionState.position = CameraPosition.fromLatLngZoom(
                 LatLng(7.8731, 80.7718), 7.5f
@@ -121,7 +121,7 @@ fun StationsScreen(
                         filteredStations.forEach { st ->
                             MarkerInfoWindow(
                                 state = MarkerState(
-                                    position = LatLng(st.latitude, st.longitude)
+                                    position = LatLng(st.latitude?: 0.0, st.longitude?: 0.0)
                                 ),
                                 title = st.name,
                                 snippet = st.location,

@@ -50,6 +50,9 @@ interface UserDao {
     @Query("UPDATE user SET is_active = 0 WHERE user_id = :userId")
     suspend fun deactivateUser(userId: String)
 
+    @Query("UPDATE user SET is_active = 0")
+    suspend fun deactivateAllUsers()
+
     // Updates the 'last_login_at' timestamp for the given user.
     @Query("UPDATE user SET last_login_at = :isoTimestamp WHERE user_id = :userId")
     suspend fun updateLastLogin(userId: String, isoTimestamp: String)

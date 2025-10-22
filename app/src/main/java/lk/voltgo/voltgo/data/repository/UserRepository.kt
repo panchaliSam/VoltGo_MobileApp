@@ -106,31 +106,38 @@ class UserRepository @Inject constructor(
     }
 
     // Fetches the currently authenticated user's profile details using the provided token.
-    suspend fun getProfile(token: String): Result<UserProfileResponse> {
-        return try {
-            val response = authApiService.getProfile("Bearer $token")
-            if (response.isSuccessful) {
-                response.body()?.let { Result.success(it) }
-                    ?: Result.failure(Exception("Empty response body"))
-            } else {
-                Result.failure(Exception("Error: ${response.code()} ${response.message()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
+    suspend fun getProfile(): Result<UserProfileResponse> = try {
+        val response = authApiService.getProfile()
+        if (response.isSuccessful) {
+            response.body()?.let { Result.success(it) }
+                ?: Result.failure(Exception("Empty response body"))
+        } else {
+            Result.failure(Exception("Error: ${response.code()} ${response.message()}"))
         }
+    } catch (e: Exception) {
+        Result.failure(e)
     }
 
+
     // Updates the authenticated user's profile information on the backend using the provided token and request data.
-    suspend fun updateProfile(
-        token: String,
-        req: UpdateProfileRequest
-    ): Result<Unit> = try {
-        val response = authApiService.updateProfile(
-            authHeader = "Bearer $token",
-            request = req
-        )
+// UserRepository.kt
+    suspend fun updateProfile(req: UpdateProfileRequest): Result<Unit> = try {
+        val response = authApiService.updateProfile(req)
         if (response.isSuccessful) Result.success(Unit)
         else Result.failure(Exception("Update failed: ${response.code()} ${response.message()}"))
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
+
+    suspend fun deactivateMe(): Result<Unit> = try {
+        val resp = authApiService.deactivateAccount()
+        if (resp.isSuccessful) {
+            // Reflect locally regardless of who is logged in, as requested.
+            userDao.deactivateAllUsers()
+            Result.success(Unit)
+        } else {
+            Result.failure(Exception("Deactivate failed: ${resp.code()} ${resp.message()}"))
+        }
     } catch (e: Exception) {
         Result.failure(e)
     }

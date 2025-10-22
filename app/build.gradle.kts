@@ -97,6 +97,9 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
 
+    // ZXing for QR code scanning
+    implementation(libs.zxing.core)
+
     // ViewModel
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 

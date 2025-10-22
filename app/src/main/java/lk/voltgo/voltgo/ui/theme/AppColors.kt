@@ -15,43 +15,51 @@ package lk.voltgo.voltgo.ui.theme
 import androidx.compose.ui.graphics.Color
 
 object AppColors {
-    // Define the main brand color palette (core identity colors)
+    /* ---------- Brand palette ---------- */
     val DeepNavy = Color(0xFF0B1026)
     val ElectricBlue = Color(0xFF1E40AF)
     val Teal = Color(0xFF0EA5A4)
 
-    // Define the accent colors that complement the primary palette
     val BrandGreen = Color(0xFF0BF50F)
     val BrandBlue = Color(0xFF1E90FF)
     val BrandWhite = Color(0xFFFFFFFF)
     val EnergyAmber = Color(0xFFFFDF21)
 
-    // Define gradient lists used in splash screens, buttons, and borders
+    /* ---------- Gradients ---------- */
     val splashGradient = listOf(DeepNavy, ElectricBlue, Teal)
     val buttonGradient = listOf(BrandGreen, BrandBlue, ElectricBlue)
     val logoBorderGradient = listOf(BrandGreen, BrandBlue)
 
-    // Define semi-transparent white variants for overlays and backgrounds
+    /* ---------- Translucent whites ---------- */
     val TranslucentWhite05 = Color.White.copy(alpha = 0.05f)
+    val TranslucentWhite20 = Color.White.copy(alpha = 0.20f)
     val TranslucentWhite85 = Color.White.copy(alpha = 0.85f)
-    val TranslucentWhite90 = Color.White.copy(alpha = 0.9f)
-    val TranslucentWhite20 = Color.White.copy(alpha = 0.2f)
+    val TranslucentWhite90 = Color.White.copy(alpha = 0.90f)
 
-    // Define tag-specific background and text colors for status indicators
+    /* ---------- Tag / Status colors (aligned to StatusChip) ---------- */
+
     // Confirmed
-    val TagConfirmedBg = Color(0xFF0BF50F)      // same hue as BrandGreen but locked for tags
-    val TagConfirmedText = DeepNavy
+    // BG: ElectricBlue @ 10%; FG: ElectricBlue
+    val TagConfirmedBg = ElectricBlue.copy(alpha = 0.10f)
+    val TagConfirmedText = ElectricBlue
+    val TagConfirmedBorder = TagConfirmedText.copy(alpha = 0.35f)
 
     // Pending
-    val TagPendingBg = Color(0xFFFFDF21)        // same hue as EnergyAmber but locked for tags
+    // BG: DeepNavy @ 8%; FG: DeepNavy
+    val TagPendingBg = DeepNavy.copy(alpha = 0.08f)
     val TagPendingText = DeepNavy
+    val TagPendingBorder = TagPendingText.copy(alpha = 0.35f)
 
     // Completed
-    val TagCompletedBg = Color(0xFFFF4545)      // same hue as Teal but locked for tags
-    val TagCompletedText = BrandWhite
+    // BG: #E6F4EA; FG: #1E4620
+    val TagCompletedBg = Color(0xFFE6F4EA)
+    val TagCompletedText = Color(0xFF1E4620)
+    val TagCompletedBorder = TagCompletedText.copy(alpha = 0.35f)
 
-    // Cancelled (neutral, readable on white)
-    val TagCancelledBg = Color(0xFFE5E7EB)      // light neutral (slate-200-ish)
-    val TagCancelledText = DeepNavy
-    val TagCancelledBorder = Color(0xFFCBD5E1)  // subtle border (slate-300-ish)
+    // Cancelled
+    // BG: #FFE8E6; FG: #7A1F1F
+    val TagCancelledBg = Color(0xFFFFE8E6)
+    val TagCancelledText = Color(0xFF7A1F1F)
+    // Kept old name for compatibility; matches pill border behavior
+    val TagCancelledBorder = TagCancelledText.copy(alpha = 0.35f)
 }

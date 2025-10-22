@@ -20,26 +20,14 @@ object UserSeeder {
 
             val demoUsers = listOf(
                 UserEntity(
-                    userId = "672c2f2f0000000000000001",
-                    email = "john.doe@gmail.com",
-                    phone = "0771234567",
-                    role = RoleType.STATION_OPERATOR,          // matches backend default
+                    userId = "68ef2fd4f26d7d9cd2d49221",
+                    email = "panchali@email.com",
+                    phone = "+94707789098",
+                    role = RoleType.EV_OWNER,          // matches backend default
                     isActive = true,
-                    nic = "901234567V",
-                    fullName = "John Doe",
-                    address = "123 Main Street, Colombo",
-                    createdAt = nowIso,
-                    lastLoginAt = null
-                ),
-                UserEntity(
-                    userId = "672c2f2f0000000000000002",
-                    email = "operator@example.com",
-                    phone = "0779876543",
-                    role = RoleType.STATION_OPERATOR,
-                    isActive = true,
-                    nic = null,
-                    fullName = "Operator User",
-                    address = "Station Road, Kandy",
+                    nic = "123456788V",
+                    fullName = "Panchali Samarasinghe",
+                    address = "123 Main Street, Colombo 07",
                     createdAt = nowIso,
                     lastLoginAt = null
                 )

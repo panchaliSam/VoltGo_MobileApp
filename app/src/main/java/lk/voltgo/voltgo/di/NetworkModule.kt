@@ -21,6 +21,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import lk.voltgo.voltgo.auth.TokenManager
 import lk.voltgo.voltgo.data.remote.api.AuthApiService
+import lk.voltgo.voltgo.data.remote.api.ReservationApiService
 import lk.voltgo.voltgo.data.remote.api.StationApiService
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -108,6 +109,12 @@ object NetworkModule {
     @Singleton
     fun provideStationApiService(retrofit: Retrofit): StationApiService {
         return retrofit.create(StationApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideReservationApiService(retrofit: Retrofit): ReservationApiService {
+        return retrofit.create(ReservationApiService::class.java)
     }
 
 }
