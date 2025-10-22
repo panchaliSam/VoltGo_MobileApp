@@ -22,6 +22,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import lk.voltgo.voltgo.data.local.VoltGoDatabase
 import lk.voltgo.voltgo.data.local.dao.ChargingStationDao
+import lk.voltgo.voltgo.data.local.dao.ReservationDao
 import lk.voltgo.voltgo.data.local.dao.UserDao
 import javax.inject.Singleton
 
@@ -50,6 +51,11 @@ object DatabaseModule {
     @Provides
     fun provideChargingStationDao(db: VoltGoDatabase): ChargingStationDao {
         return db.chargingStationDao()
+    }
+
+    @Provides
+    fun provideReservationDao(db: VoltGoDatabase): ReservationDao {
+        return db.reservationDao()
     }
 
 }

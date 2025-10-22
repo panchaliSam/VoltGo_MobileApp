@@ -42,8 +42,8 @@ fun GradientButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier
-            .height(50.dp),
+        enabled = enabled && !loading,
+        modifier = modifier.height(50.dp),
         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
         contentPadding = PaddingValues()
     ) {
@@ -51,18 +51,25 @@ fun GradientButton(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
-                    brush = Brush.horizontalGradient(
-                        colors = AppColors.buttonGradient // [BrandGreen, BrandBlue]
-                    ),
+                    brush = Brush.horizontalGradient(AppColors.buttonGradient),
                     shape = MaterialTheme.shapes.medium
                 ),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = text,
-                color = Color.White,
-                fontWeight = FontWeight.Bold
-            )
+            if (loading) {
+                androidx.compose.material3.CircularProgressIndicator(
+                    color = Color.White,
+                    strokeWidth = 2.dp,
+                    modifier = Modifier.height(20.dp)
+                )
+            } else {
+                Text(
+                    text = text,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 }
+

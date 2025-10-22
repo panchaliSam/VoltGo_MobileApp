@@ -95,7 +95,6 @@ data class UserProfileResponse(
 data class UpdateProfileRequest(
     val email: String,
     val phone: String,
-    val password: String,
-    val role: String,
-    val isActive: Boolean
+    val fullName: String,
+    val address: String
 )

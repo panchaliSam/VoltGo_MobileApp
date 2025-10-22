@@ -26,9 +26,16 @@ sealed class Screen(val route: String) {
     data object MyReservations : Screen("my_reservations")
     data object NewReservation : Screen("new_reservation")
     data object Stations : Screen("stations")
+    data object UpcomingReservations : Screen("upcoming_reservations")
+    data object ReservationDetails : Screen("reservation_details")
 
     // Operator Flow Screens
     data object OperatorHome : Screen("operator_home")
+
+    companion object {
+        fun reservationDetailsRoute(id: String) =
+            "${ReservationDetails.route}/$id"
+    }
 }
 
 // Defines the main navigation graph routes for different app sections

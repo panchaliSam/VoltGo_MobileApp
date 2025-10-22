@@ -40,7 +40,7 @@ mapsCompose = "6.1.2"
 # Security
 security = "1.1.0-alpha06"
 
-# QR Code
+# QR Code & Barcode Scanning
 zxing = "3.5.3"
 mlkitBarcodeScanning = "17.3.0"
 
@@ -58,6 +58,7 @@ credentialsPlayServicesAuth = "1.5.0"
 googleid = "1.1.1"
 runtime = "1.9.2"
 
+# No duplicate [versions] for zxing here anymore
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -78,6 +79,12 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+
+# QR Code, zxing, and Barcode Scanning
+zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
+# (optional for scanning via Camera)
+zxing-android = { group = "com.journeyapps", name = "zxing-android-embedded", version = "4.3.0" }
+mlkit-barcode-scanning = { group = "com.google.mlkit", name = "barcode-scanning", version.ref = "mlkitBarcodeScanning" }
 
 # Datastore
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
@@ -106,10 +113,7 @@ maps-compose = { group = "com.google.maps.android", name = "maps-compose", versi
 # Security
 androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "security" }
 
-# QR Code
-zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
-zxing-android = { group = "com.journeyapps", name = "zxing-android-embedded", version = "4.3.0" }
-mlkit-barcode-scanning = { group = "com.google.mlkit", name = "barcode-scanning", version.ref = "mlkitBarcodeScanning" }
+# No duplicate library definitions for zxing here anymore
 
 # Permissions
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanistPermissions" }

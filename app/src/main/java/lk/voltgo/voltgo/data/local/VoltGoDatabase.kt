@@ -22,19 +22,15 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import lk.voltgo.voltgo.data.local.dao.*
 import lk.voltgo.voltgo.data.local.entities.*
-import lk.voltgo.voltgo.data.local.seeders.EVOwnerSeeder
 import lk.voltgo.voltgo.data.local.seeders.UserSeeder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import lk.voltgo.voltgo.data.local.seeders.ChargingStationSeeder
-import lk.voltgo.voltgo.data.local.seeders.ReservationSeeder
-import lk.voltgo.voltgo.data.local.seeders.SlotSeeder
 
 @Database(
     entities = [
         UserEntity::class,
-        EVOwnerEntity::class,
         ReservationEntity::class,
         ChargingStationEntity::class,
         SlotEntity::class
@@ -46,9 +42,6 @@ abstract class VoltGoDatabase : RoomDatabase() {
 
     // Provides access to the User DAO for user-related operations.
     abstract fun userDao(): UserDao
-
-    // Provides access to the EV Owner DAO for managing EV owner data.
-    abstract fun evOwnerDao(): EVOwnerDao
 
     // Provides access to the Reservation DAO for reservation management.
     abstract fun reservationDao(): ReservationDao
@@ -85,10 +78,7 @@ abstract class VoltGoDatabase : RoomDatabase() {
                             CoroutineScope(Dispatchers.IO).launch {
                                 // Seed in order (FK safety)
                                 UserSeeder.seed(createdInstance.userDao())
-                                EVOwnerSeeder.seed(createdInstance.evOwnerDao())
                                 ChargingStationSeeder.seed(createdInstance.chargingStationDao())
-                                SlotSeeder.seed( createdInstance.slotDao())
-                                ReservationSeeder.seed(createdInstance.reservationDao())
                             }
                         }
                     })

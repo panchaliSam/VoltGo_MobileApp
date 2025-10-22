@@ -23,9 +23,8 @@ import lk.voltgo.voltgo.data.remote.dto.UserProfileResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
-import retrofit2.http.Header
+import retrofit2.http.PATCH
 import retrofit2.http.POST
-import retrofit2.http.PUT
 
 interface AuthApiService {
 
@@ -40,13 +39,15 @@ interface AuthApiService {
     // Retrieves the currently logged-in user's profile using the authorization token.
     @GET("/api/auth/profile")
     suspend fun getProfile(
-        @Header("Authorization") token: String
     ): Response<UserProfileResponse>
 
     // Updates the logged-in user's profile information using the provided token and request body.
-    @PUT("/api/auth/profile")
+    @PATCH("/api/auth/profile")
     suspend fun updateProfile(
-        @Header("Authorization") authHeader: String,
         @Body request: UpdateProfileRequest
-    ): Response<UserProfileResponse>
+    ): Response<MessageResponse>
+
+    @PATCH("/api/auth/deactivate")
+    suspend fun deactivateAccount(
+    ): Response<MessageResponse>
 }

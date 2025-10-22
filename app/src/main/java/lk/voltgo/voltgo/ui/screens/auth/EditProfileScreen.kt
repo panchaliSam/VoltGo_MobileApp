@@ -9,7 +9,11 @@
  *
  * Author: Panchali Samarasinghe
  * Created: October 10, 2025
- * Version: 1.0
+ * Version: 1.1
+ * Notes (v1.1):
+ *   - NIC is display-only (read-only)
+ *   - Phone now validates E.164 (+9470...)
+ *   - Password is NOT shown and NOT sent from this screen (sent as null/empty)
  * ---------------------------------------------------------
  */
 package lk.voltgo.voltgo.ui.screens.auth
@@ -41,8 +45,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import lk.voltgo.voltgo.data.remote.dto.UserProfileResponse
-import lk.voltgo.voltgo.ui.theme.AppColors
 import lk.voltgo.voltgo.data.remote.dto.UpdateProfileRequest
+import lk.voltgo.voltgo.ui.components.GradientButton
+import lk.voltgo.voltgo.ui.theme.AppColors
 import lk.voltgo.voltgo.ui.viewmodel.auth.ProfileViewModel
 import lk.voltgo.voltgo.ui.viewmodel.auth.UiState
 
@@ -52,12 +57,11 @@ data class ProfileForm(
     val phone: String = "",
     val nic: String = "",
     val address: String = "",
-    val password: String = "",
+    val password: String = "", // not used here (kept for DTO compatibility)
     val role: String = "",
     val isActive: Boolean = true
 )
 
-// Main composable that manages the profile edit flow including loading, saving, and error handling
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(
@@ -90,13 +94,14 @@ fun EditProfileScreen(
                 isSaving = updateState is UiState.Loading,
                 onBack = onBack,
                 onSave = { profileForm ->
+                    // IMPORTANT:
+                    // We do not update password here. Send null (preferred) or empty if DTO requires non-null.
                     viewModel.updateProfile(
                         UpdateProfileRequest(
                             email = profileForm.email.trim(),
                             phone = profileForm.phone.trim(),
-                            password = profileForm.password,
-                            role = profileForm.role,
-                            isActive = profileForm.isActive
+                            fullName = profileForm.fullName.trim(),
+                            address = profileForm.address.trim()
                         )
                     )
                 },
@@ -124,19 +129,16 @@ fun EditProfileScreen(
         when (updateState) {
             is UiState.Success -> {
                 snackbarHostState.showSnackbar("Profile updated successfully")
-                viewModel.loadProfile() // Reload profile
+                viewModel.loadProfile() // Reload profile for fresh values
             }
             is UiState.Error -> {
-                snackbarHostState.showSnackbar(
-                    (updateState as UiState.Error).message
-                )
+                snackbarHostState.showSnackbar((updateState as UiState.Error).message)
             }
-            else -> {} // Handle other states if needed
+            else -> Unit
         }
     }
 }
 
-// Displays the editable profile form and handles input validation and saving logic
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileContent(
@@ -148,29 +150,35 @@ fun EditProfileContent(
 ) {
     val scope = rememberCoroutineScope()
 
+    // --- state ---
     var fullName by rememberSaveable { mutableStateOf(initial.fullName) }
     var email by rememberSaveable { mutableStateOf(initial.email) }
-    var phone by rememberSaveable { mutableStateOf(initial.phone) }
-    var nic by rememberSaveable { mutableStateOf(initial.nic) }
+    var phone by rememberSaveable { mutableStateOf(initial.phone) } // E.164 allowed
+    var nic by rememberSaveable { mutableStateOf(initial.nic) }     // read-only
     var address by rememberSaveable { mutableStateOf(initial.address) }
 
+    // --- validators ---
     val emailValid = remember(email) {
-        // simple email check – adjust if you need stricter rules
-        Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$").matches(email)
+        Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
+            .matches(email.trim())
     }
-    val phoneValid = remember(phone) { phone.length in 9..12 && phone.all { it.isDigit() } }
+
+    // E.164: optional +, first digit 1-9, total digits 8..15
+    val e164Regex = remember { Regex("^\\+?[1-9]\\d{7,14}$") }
+    val phoneValid = remember(phone) { e164Regex.matches(phone.trim()) }
+
     val nameValid = remember(fullName) { fullName.trim().length >= 3 }
-    val nicValid = remember(nic) { nic.trim().length >= 10 } // tweak for your NIC rules if needed
 
-    val formChanged = remember(fullName, email, phone, nic, address, initial) {
-        fullName != initial.fullName ||
-                email != initial.email ||
-                phone != initial.phone ||
-                nic != initial.nic ||
-                address != initial.address
+    // NIC no longer affects validity (display-only here)
+    val formValid = nameValid && emailValid && phoneValid
+
+    val formChanged = remember(fullName, email, phone, address, initial) {
+        (fullName != initial.fullName) ||
+                (email != initial.email) ||
+                (phone != initial.phone) ||
+                (address != initial.address)
+        // NIC intentionally excluded (read-only)
     }
-
-    val formValid = nameValid && emailValid && phoneValid && nicValid
 
     Scaffold(
         topBar = {
@@ -196,9 +204,9 @@ fun EditProfileContent(
                                         fullName = fullName.trim(),
                                         email = email.trim(),
                                         phone = phone.trim(),
-                                        nic = nic.trim(),
+                                        nic = initial.nic, // unchanged
                                         address = address.trim(),
-                                        password = initial.password,
+                                        password = initial.password,     // not used
                                         role = initial.role,
                                         isActive = initial.isActive
                                     )
@@ -269,7 +277,7 @@ fun EditProfileContent(
                     .padding(horizontal = 20.dp, vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
-
+                // Full name
                 OutlinedTextField(
                     value = fullName,
                     onValueChange = { fullName = it },
@@ -287,31 +295,36 @@ fun EditProfileContent(
                     )
                 )
 
+                // Email (read-only)
                 OutlinedTextField(
                     value = email,
-                    onValueChange = { email = it },
+                    onValueChange = { /* read-only */ },
                     label = { Text("Email") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
-                    isError = email.isNotBlank() && !emailValid,
-                    supportingText = {
-                        if (email.isNotBlank() && !emailValid) Text("Enter a valid email address")
-                    },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Email,
-                        imeAction = ImeAction.Next
-                    )
+                    enabled = false,
+                    readOnly = true
                 )
 
+                // Phone (E.164)
                 OutlinedTextField(
                     value = phone,
-                    onValueChange = { if (it.length <= 12) phone = it },
+                    onValueChange = { raw ->
+                        // Allow leading '+' once; digits otherwise; max 15 total
+                        val sanitized = buildString {
+                            raw.forEachIndexed { i, c ->
+                                if (c.isDigit()) append(c)
+                                else if (i == 0 && c == '+') append(c)
+                            }
+                        }.take(15)
+                        phone = sanitized
+                    },
                     label = { Text("Phone") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     isError = phone.isNotBlank() && !phoneValid,
                     supportingText = {
-                        if (phone.isNotBlank() && !phoneValid) Text("Digits only (9–12)")
+                        if (phone.isNotBlank() && !phoneValid) Text("Use E.164 format, e.g. +94707789099")
                     },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Phone,
@@ -319,22 +332,18 @@ fun EditProfileContent(
                     )
                 )
 
+                // NIC (read-only)
                 OutlinedTextField(
                     value = nic,
-                    onValueChange = { nic = it },
+                    onValueChange = { /* read-only */ },
                     label = { Text("NIC") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
-                    isError = nic.isNotBlank() && !nicValid,
-                    supportingText = {
-                        if (nic.isNotBlank() && !nicValid) Text("NIC seems too short")
-                    },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Ascii,
-                        imeAction = ImeAction.Next
-                    )
+                    enabled = false,
+                    readOnly = true
                 )
 
+                // Address (multiline)
                 OutlinedTextField(
                     value = address,
                     onValueChange = { address = it },
@@ -352,7 +361,8 @@ fun EditProfileContent(
                 Spacer(Modifier.height(6.dp))
 
                 // Primary action button (duplicate of top-right save for reachability)
-                Button(
+                GradientButton(
+                    text = if (isSaving) "Saving…" else "Save changes",
                     onClick = {
                         if (formValid) {
                             onSave(
@@ -360,9 +370,9 @@ fun EditProfileContent(
                                     fullName = fullName.trim(),
                                     email = email.trim(),
                                     phone = phone.trim(),
-                                    nic = nic.trim(),
+                                    nic = initial.nic,
                                     address = address.trim(),
-                                    password = initial.password,
+                                    password = "", // not used here
                                     role = initial.role,
                                     isActive = initial.isActive
                                 )
@@ -373,26 +383,16 @@ fun EditProfileContent(
                             }
                         }
                     },
+                    modifier = Modifier.fillMaxWidth(),
                     enabled = formValid && formChanged && !isSaving,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    if (isSaving) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(18.dp),
-                            strokeWidth = 2.dp
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        Text("Saving…")
-                    } else {
-                        Text("Save changes")
-                    }
-                }
+                    loading = isSaving
+                )
+
             }
         }
     }
 }
 
-// Displays error message and retry button when loading profile fails
 @Composable
 private fun ErrorContent(
     message: String,
@@ -413,11 +413,8 @@ private fun ErrorContent(
     }
 }
 
-// Preview composable for Android Studio to visualize the Edit Profile screen
 @Preview(showBackground = true)
 @Composable
 private fun EditProfileScreenPreview() {
-    EditProfileScreen(
-        onBack = {}
-    )
+    EditProfileScreen(onBack = {})
 }
