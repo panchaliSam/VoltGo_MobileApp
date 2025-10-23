@@ -10,9 +10,11 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Logout
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,11 +32,15 @@ import lk.voltgo.voltgo.ui.viewmodel.operator.OperatorViewModel
 @Composable
 fun EVOperatorScreen(
     stationName: String,
-    onBackClick: () -> Unit,
+    onLoggedOut: () -> Unit,
     viewModel: OperatorViewModel = hiltViewModel()
 ) {
     val ui by viewModel.ui.collectAsState()
     val snackbar = remember { SnackbarHostState() }
+
+    LaunchedEffect(ui.loggedOut) {
+        if (ui.loggedOut) onLoggedOut()
+    }
 
     val scanLauncher = rememberLauncherForActivityResult(ScanContract()) { result ->
         if (result.contents != null) {
@@ -57,9 +63,17 @@ fun EVOperatorScreen(
                         fontWeight = FontWeight.Bold
                     )
                 },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = AppColors.DeepNavy)
+                actions = {
+                    // Logout action (DeepNavy tint to match your palette)
+                    IconButton(
+                        onClick = { viewModel.logout() },
+                        enabled = !ui.isLoggingOut
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Logout,
+                            contentDescription = "Logout",
+                            tint = AppColors.DeepNavy
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent)

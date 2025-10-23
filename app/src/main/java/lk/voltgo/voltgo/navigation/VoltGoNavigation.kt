@@ -120,7 +120,7 @@ fun VoltGoNavigation(
 
                 EVOperatorScreen(
                     stationName = stationName,
-                    onBackClick = { navController.popBackStack() }
+                    onLoggedOut = { navController.navigate(Screen.Login.route)}
                 )
             }
         }

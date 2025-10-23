@@ -1,7 +1,10 @@
 package lk.voltgo.voltgo.data.repository
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
+import lk.voltgo.voltgo.data.local.dao.ChargingStationDao
 import lk.voltgo.voltgo.data.local.entities.ChargingStationEntity
 import lk.voltgo.voltgo.data.remote.api.StationApiService
 import javax.inject.Inject
@@ -9,7 +12,8 @@ import javax.inject.Singleton
 
 @Singleton
 class StationRepository @Inject constructor(
-    private val stationApiService: StationApiService
+    private val stationApiService: StationApiService,
+    private val stationDao: ChargingStationDao
 ) {
 
     // Fetch all stations directly from the API
@@ -30,37 +34,74 @@ class StationRepository @Inject constructor(
                         isActive = dto.isActive
                     )
                 }
+
+                // Persist to SQLite (transactional on IO)
+                withContext(Dispatchers.IO) {
+                    stationDao.insertStations(entityList) // REPLACE on conflict
+
+                    // Optional strict mirror: remove rows not in latest payload
+                    val ids = entityList.map { it.id }
+                    if (ids.isNotEmpty()) {
+                        stationDao.deleteStationsNotIn(ids)
+                    }
+                }
+
+                // Emit what we saved
                 emit(entityList)
             } else {
-                emit(emptyList())
+                // On error, emit cached data (active stations) as fallback
+                emitCachedActive()
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            emit(emptyList())
+            // On exception, emit cached data (active stations) as fallback
+            emitCachedActive()
         }
     }
 
-    // Fetch a single station by ID
+    private suspend fun emitCachedActive(): List<ChargingStationEntity> =
+        withContext(Dispatchers.IO) {
+            // Query DB directly (one-shot). If you prefer a reactive stream, expose dao.observeActiveStations().
+            stationDao.searchStations("%") // or create a dao.getAllActive() if you prefer
+                .ifEmpty {
+                    // If you want strictly active only:
+                    // stationDao.getAllActive()
+                    emptyList()
+                }
+        }
+
+    // If you want a reactive stream of DB changes elsewhere:
+    fun observeActiveStations(): Flow<List<ChargingStationEntity>> =
+        stationDao.observeActiveStations()
+
+    // Fetch a single station by ID (prefer local first; fallback to network)
     suspend fun getStationById(stationId: String): ChargingStationEntity? {
         return try {
-            val response = stationApiService.getStationById(stationId)
-            if (response.isSuccessful) {
-                response.body()?.let { dto ->
-                    ChargingStationEntity(
-                        id = dto.stationId,
-                        name = dto.name,
-                        type = dto.type,
-                        location = dto.location,
-                        latitude = dto.latitude,
-                        longitude = dto.longitude,
-                        availableSlots = dto.availableSlots,
-                        isActive = dto.isActive
-                    )
-                }
-            } else null
+            // Try local first
+            stationDao.getStationById(stationId) ?: run {
+                // Fallback to network, persist, return
+                val response = stationApiService.getStationById(stationId)
+                if (response.isSuccessful) {
+                    response.body()?.let { dto ->
+                        val entity = ChargingStationEntity(
+                            id = dto.stationId,
+                            name = dto.name,
+                            type = dto.type,
+                            location = dto.location,
+                            latitude = dto.latitude,
+                            longitude = dto.longitude,
+                            availableSlots = dto.availableSlots,
+                            isActive = dto.isActive
+                        )
+                        withContext(Dispatchers.IO) { stationDao.insertStation(entity) }
+                        entity
+                    }
+                } else null
+            }
         } catch (e: Exception) {
             e.printStackTrace()
-            null
+            // Last fallback: whatever is in DB
+            stationDao.getStationById(stationId)
         }
     }
 
