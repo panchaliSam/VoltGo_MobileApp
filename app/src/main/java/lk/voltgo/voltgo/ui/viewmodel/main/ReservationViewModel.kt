@@ -86,6 +86,20 @@ class ReservationViewModel @Inject constructor(
         }
     }
 
+    fun cancelReservation(resId: String) {
+        val nic = currentOwnerNic ?: return
+        _state.update { it.copy(isLoading = true) }
+
+        viewModelScope.launch {
+            val result = repo.cancelReservation(resId)
+            if (result.isSuccess) {
+                refresh(nic)
+            } else {
+                _state.update { it.copy(isLoading = false, error = result.exceptionOrNull()?.message) }
+            }
+        }
+    }
+
     fun setFilter(filter: ReservationFilter) {
         _state.update { s ->
             s.copy(
