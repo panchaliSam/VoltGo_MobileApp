@@ -1,3 +1,4 @@
+// OperatorViewModel.kt
 package lk.voltgo.voltgo.ui.viewmodel.operator
 
 import androidx.lifecycle.ViewModel
@@ -8,20 +9,24 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import lk.voltgo.voltgo.auth.AuthManager
 import lk.voltgo.voltgo.data.remote.dto.BookingDto
 import lk.voltgo.voltgo.data.repository.OperatorRepository
 
 data class OperatorUiState(
     val isVerifying: Boolean = false,
     val isCompleting: Boolean = false,
+    val isLoggingOut: Boolean = false,
     val error: String? = null,
     val info: String? = null,
-    val booking: BookingDto? = null
+    val booking: BookingDto? = null,
+    val loggedOut: Boolean = false
 )
 
 @HiltViewModel
 class OperatorViewModel @Inject constructor(
-    private val repo: OperatorRepository
+    private val repo: OperatorRepository,
+    private val auth: AuthManager
 ) : ViewModel() {
 
     private val _ui = MutableStateFlow(OperatorUiState())
@@ -69,6 +74,17 @@ class OperatorViewModel @Inject constructor(
                         state.copy(isCompleting = false, error = e.message ?: "Complete failed")
                     }
                 )
+            }
+        }
+    }
+
+    fun logout() {
+        _ui.update { it.copy(isLoggingOut = true, error = null, info = null) }
+        viewModelScope.launch {
+            val ok = auth.logout()
+            _ui.update {
+                if (ok) it.copy(isLoggingOut = false, loggedOut = true)
+                else it.copy(isLoggingOut = false, error = "Logout failed")
             }
         }
     }

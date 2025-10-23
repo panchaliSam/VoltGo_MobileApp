@@ -55,5 +55,8 @@ interface ChargingStationDao {
     // Inserts demo charging stations used for pre-populating or testing.
     @Insert
     fun insertAll(demoStations: List<ChargingStationEntity>)
+
+    @Query("DELETE FROM charging_station WHERE id NOT IN (:ids)")
+    suspend fun deleteStationsNotIn(ids: List<String>)
 }
 
