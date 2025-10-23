@@ -16,14 +16,18 @@
 
 package lk.voltgo.voltgo.ui.screens.main
 
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.border
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Bookmarks
 import androidx.compose.material.icons.filled.Map
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EventAvailable
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -40,6 +44,7 @@ import lk.voltgo.voltgo.ui.viewmodel.auth.HomeViewModel
 
 // Main composable for the Home Screen.
 // Displays greeting text, navigation cards, and a profile menu.
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -54,6 +59,12 @@ fun HomeScreen(
     var showProfileMenu by remember { mutableStateOf(false) }
     var showDeactivateDialog by remember { mutableStateOf(false) }
     var isProcessing by remember { mutableStateOf(false) }
+
+    // --- NEW: collect stats and trigger initial load ---
+    val stats by viewModel.stats.collectAsState()
+    LaunchedEffect(Unit) {
+        viewModel.loadHomeStats()
+    }
 
     Scaffold(
         topBar = {
@@ -126,7 +137,14 @@ fun HomeScreen(
                 color = AppColors.TranslucentWhite85
             )
 
-            Spacer(Modifier.height(8.dp))
+            // --- NEW: Quick Stats row ---
+            StatsRow(
+                pendingCount = stats.pendingCount,
+                approvedFutureCount = stats.approvedFutureCount,
+                isLoading = stats.isLoading,
+                onOpenPending = onMyReservationsClick,
+                onOpenApprovedFuture = onUpcomingReservationsClick
+            )
 
             // Cards
             GradientActionCard(
@@ -165,9 +183,8 @@ fun HomeScreen(
                                 showDeactivateDialog = false
                                 onNavigateToLogin()
                             },
-                            onError = { err ->
+                            onError = { _ ->
                                 isProcessing = false
-                                // optional: show a snackbar/toast; for now we just close the dialog
                                 showDeactivateDialog = false
                             }
                         )
@@ -250,7 +267,107 @@ private fun DeactivateAccountDialog(
     )
 }
 
+@Composable
+private fun StatsRow(
+    pendingCount: Int,
+    approvedFutureCount: Int,
+    isLoading: Boolean,
+    onOpenPending: () -> Unit,
+    onOpenApprovedFuture: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        StatCard(
+            title = "Pending",
+            value = pendingCount,
+            onClick = onOpenPending,
+            loading = isLoading,
+            accentBg = AppColors.TagPendingBg,
+            accentText = AppColors.TagPendingText,
+            modifier = Modifier.weight(1f)
+        )
+
+        StatCard(
+            title = "Approved (Upcoming)",
+            value = approvedFutureCount,
+            onClick = onOpenApprovedFuture,
+            loading = isLoading,
+            accentBg = AppColors.TagConfirmedBg,
+            accentText = AppColors.TagConfirmedText,
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+private fun StatCard(
+    title: String,
+    value: Int,
+    onClick: () -> Unit,
+    loading: Boolean,
+    accentBg: androidx.compose.ui.graphics.Color,
+    accentText: androidx.compose.ui.graphics.Color,
+    modifier: Modifier = Modifier
+) {
+    val shape = RoundedCornerShape(16.dp)
+    val border = Brush.linearGradient(AppColors.splashGradient)
+
+    ElevatedCard(
+        modifier = modifier
+            .border(width = 2.dp, brush = border, shape = shape),
+        shape = shape,
+        colors = CardDefaults.elevatedCardColors(containerColor = AppColors.BrandWhite),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 1.dp),
+        onClick = onClick
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelLarge,
+                color = AppColors.ElectricBlue
+            )
+
+            if (loading) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    CircularProgressIndicator(strokeWidth = 2.dp, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("Loading…", style = MaterialTheme.typography.bodyMedium, color = AppColors.DeepNavy)
+                }
+            } else {
+                Text(
+                    text = value.toString(),
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = AppColors.DeepNavy,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            // little status chip for consistency with app style
+            Surface(
+                shape = RoundedCornerShape(50),
+                color = accentBg,
+                contentColor = accentText,
+                border = BorderStroke(1.dp, accentText.copy(alpha = 0.35f))
+            ) {
+                Text(
+                    text = if (title.startsWith("Approved")) "Confirmed • Future" else "Pending",
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                    maxLines = 1
+                )
+            }
+        }
+    }
+}
+
 // Preview function for displaying the Home Screen in Android Studio’s preview mode.
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 private fun HomeScreenPreview() {
