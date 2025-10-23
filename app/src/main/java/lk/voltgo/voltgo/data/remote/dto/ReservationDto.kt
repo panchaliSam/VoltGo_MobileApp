@@ -61,3 +61,7 @@ data class NewReservationResponse(
     val message: String,
     val bookingId: String
 )
+
+data class ReservationMessageResponse(
+    val message: String
+)

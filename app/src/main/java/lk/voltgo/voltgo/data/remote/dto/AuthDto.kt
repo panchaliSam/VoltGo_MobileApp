@@ -71,7 +71,8 @@ data class LoginRequest(
 )
 
 // Represents a simple message-based response from the API, typically after registration.
-data class MessageResponse(
+data class AuthMessageResponse(
+    @SerializedName("message")
     val message: String
 )
 

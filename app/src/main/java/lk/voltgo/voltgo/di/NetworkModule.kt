@@ -21,6 +21,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import lk.voltgo.voltgo.auth.TokenManager
 import lk.voltgo.voltgo.data.remote.api.AuthApiService
+import lk.voltgo.voltgo.data.remote.api.OperatorApiService
 import lk.voltgo.voltgo.data.remote.api.ReservationApiService
 import lk.voltgo.voltgo.data.remote.api.SlotApiService
 import lk.voltgo.voltgo.data.remote.api.StationApiService
@@ -35,7 +36,9 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private const val BASE_URL = "http://10.0.2.2:5005"
+    //private const val BASE_URL = "http://10.0.2.2:5005"
+    //private const val BASE_URL = "http://192.168.1.88:5005"
+    private const val BASE_URL = "https://unbegged-crunchiest-selene.ngrok-free.dev"
 
     // Provides the authentication interceptor that attaches the Bearer token to API requests.
     @Provides
@@ -122,6 +125,12 @@ object NetworkModule {
     @Singleton
     fun provideSlotApiService(retrofit: Retrofit): SlotApiService {
         return retrofit.create(SlotApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideOperatorApiService(retrofit: Retrofit): OperatorApiService {
+        return retrofit.create(OperatorApiService::class.java)
     }
 
 }
