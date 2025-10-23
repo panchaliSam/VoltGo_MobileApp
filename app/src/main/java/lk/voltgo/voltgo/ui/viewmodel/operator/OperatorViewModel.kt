@@ -51,23 +51,22 @@ class OperatorViewModel @Inject constructor(
         }
     }
 
-    fun complete() {
+    fun complete(bookingId: String) {
         _ui.update { it.copy(isCompleting = true, error = null, info = null) }
         viewModelScope.launch {
-            val result = repo.complete()
-            _ui.update {
+            val result = repo.complete(bookingId)
+            _ui.update { state ->
                 result.fold(
                     onSuccess = { msg ->
-                        // mark completed in UI
-                        val updated = it.booking?.copy(status = "Completed")
-                        it.copy(
+                        val updated = state.booking?.copy(status = "Completed")
+                        state.copy(
                             isCompleting = false,
                             booking = updated,
                             info = msg.message
                         )
                     },
                     onFailure = { e ->
-                        it.copy(isCompleting = false, error = e.message ?: "Complete failed")
+                        state.copy(isCompleting = false, error = e.message ?: "Complete failed")
                     }
                 )
             }

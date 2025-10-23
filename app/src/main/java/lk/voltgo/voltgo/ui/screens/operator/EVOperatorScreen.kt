@@ -18,9 +18,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import lk.voltgo.voltgo.ui.components.VoltGoGradientButton
 import lk.voltgo.voltgo.ui.theme.AppColors
 import lk.voltgo.voltgo.ui.viewmodel.operator.OperatorViewModel
 
@@ -36,21 +38,31 @@ fun EVOperatorScreen(
 
     val scanLauncher = rememberLauncherForActivityResult(ScanContract()) { result ->
         if (result.contents != null) {
-            // base64 encode the raw QR content
             val base64 = Base64.encodeToString(result.contents.toByteArray(), Base64.NO_WRAP)
             viewModel.verifyBase64(base64)
         }
     }
 
+    val cardShape = RoundedCornerShape(16.dp)
+    val gradientBorder = Brush.linearGradient(AppColors.splashGradient)
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Station Operator") },
+                title = {
+                    Text(
+                        "Station Operator",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = AppColors.DeepNavy,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = AppColors.DeepNavy)
                     }
-                }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent)
             )
         },
         snackbarHost = { SnackbarHost(snackbar) },
@@ -64,19 +76,39 @@ fun EVOperatorScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(
-                stationName,
-                style = MaterialTheme.typography.titleLarge,
-                color = AppColors.DeepNavy,
-                fontWeight = FontWeight.Bold
-            )
-
-            // Scan card
+            // Header card (mirrors MyReservations header)
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(1.5.dp, Brush.linearGradient(AppColors.logoBorderGradient), RoundedCornerShape(16.dp)),
-                shape = RoundedCornerShape(16.dp)
+                    .border(2.dp, gradientBorder, cardShape),
+                shape = cardShape,
+                colors = CardDefaults.cardColors(containerColor = AppColors.BrandWhite),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    Text(
+                        stationName,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = AppColors.DeepNavy,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Scan the customer’s QR, verify booking, then complete.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = AppColors.ElectricBlue
+                    )
+                }
+            }
+
+            // Scan card (same gradient border + colors)
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(2.dp, gradientBorder, cardShape),
+                shape = cardShape,
+                colors = CardDefaults.cardColors(containerColor = AppColors.BrandWhite),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
                 Column(
                     Modifier.padding(16.dp),
@@ -84,64 +116,71 @@ fun EVOperatorScreen(
                 ) {
                     Text("Scan QR to verify booking", color = AppColors.DeepNavy, fontWeight = FontWeight.SemiBold)
 
-                    Button(
+                    VoltGoGradientButton(
+                        text = if (ui.isVerifying) "Verifying…" else "Scan QR",
+                        leadingIcon = Icons.Default.QrCodeScanner,
+                        enabled = !ui.isVerifying,
                         onClick = {
                             val opts = ScanOptions()
                                 .setBeepEnabled(true)
                                 .setPrompt("Align QR inside the frame")
                                 .setOrientationLocked(false)
                             scanLauncher.launch(opts)
-                        },
-                        enabled = !ui.isVerifying,
-                        shape = RoundedCornerShape(14.dp)
-                    ) {
-                        Icon(Icons.Default.QrCodeScanner, contentDescription = null)
-                        Spacer(Modifier.width(8.dp))
-                        Text(if (ui.isVerifying) "Verifying…" else "Scan QR")
-                    }
+                        }
+                    )
 
                     if (ui.error != null) {
-                        Text(ui.error!!, color = MaterialTheme.colorScheme.error)
+                        Text(ui.error!!, color = AppColors.TagCancelledText, style = MaterialTheme.typography.bodyMedium)
                     }
                     if (ui.info != null) {
-                        Text(ui.info!!, color = AppColors.ElectricBlue)
+                        Text(ui.info!!, color = AppColors.ElectricBlue, style = MaterialTheme.typography.bodyMedium)
                     }
                 }
             }
 
-            // Booking details card
+            // Booking details card (colors & chip style match MyReservations)
             if (ui.booking != null) {
                 val b = ui.booking!!
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.5.dp, Brush.linearGradient(AppColors.logoBorderGradient), RoundedCornerShape(16.dp)),
-                    shape = RoundedCornerShape(16.dp)
+                        .border(2.dp, gradientBorder, cardShape),
+                    shape = cardShape,
+                    colors = CardDefaults.cardColors(containerColor = AppColors.BrandWhite),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                 ) {
-                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("Reservation", color = AppColors.DeepNavy, fontWeight = FontWeight.SemiBold)
+                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                            Text(
+                                "Reservation",
+                                color = AppColors.DeepNavy,
+                                fontWeight = FontWeight.SemiBold,
+                                style = MaterialTheme.typography.titleSmall,
+                                modifier = Modifier.weight(1f)
+                            )
+                            StatusChip(status = b.status)
+                        }
+
                         KeyValue("Booking ID", b.id)
                         KeyValue("Owner NIC", b.ownerNIC)
                         KeyValue("Station", b.stationId)
                         KeyValue("Slot", b.slotId ?: "-")
                         KeyValue("Date", b.reservationDate)
-                        StatusPill(b.status)
 
-                        Spacer(Modifier.height(8.dp))
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            Button(
-                                onClick = { viewModel.complete() },
+                        Spacer(Modifier.height(6.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                            VoltGoGradientButton(
+                                text = if (ui.isCompleting) "Completing…" else "Complete booking",
+                                leadingIcon = Icons.Outlined.CheckCircle,
                                 enabled = !ui.isCompleting && b.status.equals("Confirmed", true),
-                                shape = RoundedCornerShape(14.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = AppColors.ElectricBlue)
-                            ) {
-                                Icon(Icons.Outlined.CheckCircle, contentDescription = null)
-                                Spacer(Modifier.width(6.dp))
-                                Text(if (ui.isCompleting) "Completing…" else "Complete booking")
-                            }
+                                onClick = { viewModel.complete(b.id) },
+                                modifier = Modifier.weight(1f)
+                            )
                             OutlinedButton(
                                 onClick = { viewModel.reset() },
-                                shape = RoundedCornerShape(14.dp)
+                                shape = RoundedCornerShape(14.dp),
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.DeepNavy)
                             ) { Text("Scan another") }
                         }
                     }
@@ -151,27 +190,37 @@ fun EVOperatorScreen(
     }
 }
 
+/* ---------- Shared bits styled like MyReservations ---------- */
+
 @Composable
 private fun KeyValue(k: String, v: String) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(k, color = AppColors.DeepNavy.copy(alpha = .7f))
-        Text(v, color = AppColors.DeepNavy, fontWeight = FontWeight.SemiBold)
+        Text(k, color = AppColors.DeepNavy.copy(alpha = .7f), style = MaterialTheme.typography.bodyMedium)
+        Text(v, color = AppColors.DeepNavy, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium)
     }
 }
 
 @Composable
-private fun StatusPill(status: String) {
-    val (bg, fg) = when (status.lowercase()) {
-        "confirmed" -> AppColors.TagConfirmedBg to AppColors.TagConfirmedText
-        "completed" -> AppColors.TagCompletedBg to AppColors.TagCompletedText
-        "cancelled" -> AppColors.TagCancelledBg to AppColors.TagCancelledText
-        else        -> AppColors.TagPendingBg to AppColors.TagPendingText
+private fun StatusChip(status: String) {
+    val (label, bg, fg) = when (status.lowercase()) {
+        "confirmed" -> Triple("Confirmed", AppColors.TagConfirmedBg, AppColors.TagConfirmedText)
+        "pending"   -> Triple("Pending",   AppColors.TagPendingBg,   AppColors.TagPendingText)
+        "completed" -> Triple("Completed", AppColors.TagCompletedBg, AppColors.TagCompletedText)
+        "cancelled" -> Triple("Cancelled", AppColors.TagCancelledBg, AppColors.TagCancelledText)
+        else        -> Triple(status,      AppColors.TagPendingBg,   AppColors.TagPendingText)
     }
+
     Surface(
-        color = bg, contentColor = fg,
-        shape = RoundedCornerShape(999.dp),
+        shape = RoundedCornerShape(50),
+        color = bg,
+        contentColor = fg,
         border = ButtonDefaults.outlinedButtonBorder
     ) {
-        Text(status, modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp), fontWeight = FontWeight.Medium)
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+            maxLines = 1
+        )
     }
 }

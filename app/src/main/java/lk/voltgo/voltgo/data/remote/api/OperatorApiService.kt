@@ -7,11 +7,12 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface OperatorApiService {
 
     @PATCH("/api/Booking/{id}/complete")
-    suspend fun completeReservation(): Response<CompleteMessageResponse>
+    suspend fun completeReservation(@Path("id") id: String): Response<CompleteMessageResponse>
 
     @POST("/api/Booking/mobile/scan-qr")
     suspend fun scanReservationQr(@Body request: ScanReservationQrRequest): Response<ScanReservationQrResponse>

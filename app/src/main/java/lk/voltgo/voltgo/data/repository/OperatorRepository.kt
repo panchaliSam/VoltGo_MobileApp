@@ -17,10 +17,14 @@ class OperatorRepository @Inject constructor(
         Result.failure(t)
     }
 
-    suspend fun complete(): Result<CompleteMessageResponse> = try {
-        val resp = api.completeReservation()
-        if (resp.isSuccessful) Result.success(resp.body()!!)
-        else Result.failure(IllegalStateException("Complete failed: HTTP ${resp.code()}"))
+    suspend fun complete(bookingId: String): Result<CompleteMessageResponse> = try {
+        val resp = api.completeReservation(bookingId)
+        if (resp.isSuccessful) {
+            val body = resp.body() ?: return Result.failure(IllegalStateException("Empty body"))
+            Result.success(body)
+        } else {
+            Result.failure(IllegalStateException("Complete failed: HTTP ${resp.code()}"))
+        }
     } catch (t: Throwable) {
         Result.failure(t)
     }
