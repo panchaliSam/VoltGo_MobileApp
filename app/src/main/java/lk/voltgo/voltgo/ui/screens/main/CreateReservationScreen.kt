@@ -1,3 +1,8 @@
+// File: CreateReservationScreen.kt
+// Author: Panchali Samarasinghe
+// Date: 24 Oct 2025
+// Version: 2.0 - Updated to accept route arguments
+
 package lk.voltgo.voltgo.ui.screens.main
 
 import android.os.Build
@@ -14,22 +19,46 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavBackStackEntry
 import lk.voltgo.voltgo.ui.theme.AppColors
 import lk.voltgo.voltgo.ui.viewmodel.main.CreateReservationViewModel
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateReservationScreen(
-    viewModel: CreateReservationViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
-    onSuccess: (bookingId: String) -> Unit
+    onSuccess: (bookingId: String) -> Unit,
+    viewModel: CreateReservationViewModel = hiltViewModel(),
+    navBackStackEntry: NavBackStackEntry? = null
 ) {
+    val context = LocalContext.current
+    val args = navBackStackEntry?.arguments
+
+    // Extract route arguments
+    val stationId = args?.getString("stationId").orEmpty()
+    val physicalSlotNumber = args?.getString("physicalSlotNumber")?.toIntOrNull() ?: 0
+    val reservationDateIso = args?.getString("reservationDateIso").orEmpty()
+    val startTimeIso = args?.getString("startTimeIso").orEmpty()
+    val endTimeIso = args?.getString("endTimeIso").orEmpty()
+
+    // Initialize ViewModel only once
+    LaunchedEffect(Unit) {
+        viewModel.initialize(
+            stationId = stationId,
+            physicalSlotNumber = physicalSlotNumber,
+            reservationDateIso = reservationDateIso,
+            startTimeIso = startTimeIso,
+            endTimeIso = endTimeIso
+        )
+    }
+
     val ui by viewModel.ui.collectAsState()
 
     // If success → hand off bookingId
@@ -61,15 +90,17 @@ fun CreateReservationScreen(
             // Summary card
             GradientCard {
                 Text(
-                    "Summary",
+                    "Reservation Summary",
                     style = MaterialTheme.typography.titleMedium,
                     color = AppColors.DeepNavy,
                     fontWeight = FontWeight.SemiBold
                 )
                 Spacer(Modifier.height(8.dp))
                 InfoRow("Station ID", ui.stationId)
-                InfoRow("Slot ID", ui.slotId)
+                InfoRow("Physical Slot", ui.physicalSlotNumber.toString())
                 InfoRow("Date", formatDate(ui.reservationDateIso))
+                InfoRow("Start Time", formatSingleTime(ui.startTimeIso))
+                InfoRow("End Time", formatSingleTime(ui.endTimeIso))
             }
 
             // Notes
@@ -164,15 +195,17 @@ private fun InfoRow(title: String, value: String) {
 
 @RequiresApi(Build.VERSION_CODES.O)
 private fun formatDate(iso: String): String = try {
-    val dt = OffsetDateTime.parse(iso)
-    dt.format(DateTimeFormatter.ofPattern("EEE, dd MMM yyyy"))
+    OffsetDateTime.parse(iso).format(DateTimeFormatter.ofPattern("EEE, dd MMM yyyy"))
 } catch (_: Exception) { iso }
 
 @RequiresApi(Build.VERSION_CODES.O)
-private fun formatTimeRange(iso: String): String {
-    // If you only have the date (midnight), return "-"
-    return try {
-        val dt = OffsetDateTime.parse(iso)
-        dt.format(DateTimeFormatter.ofPattern("HH:mm")) // adjust if you want a range
-    } catch (_: Exception) { "-" }
-}
+private fun formatTimeRange(startIso: String, endIso: String): String = try {
+    val start = OffsetDateTime.parse(startIso).format(DateTimeFormatter.ofPattern("hh:mm a"))
+    val end = OffsetDateTime.parse(endIso).format(DateTimeFormatter.ofPattern("hh:mm a"))
+    "$start – $end"
+} catch (_: Exception) { "-" }
+
+@RequiresApi(Build.VERSION_CODES.O)
+private fun formatSingleTime(iso: String): String = try {
+    OffsetDateTime.parse(iso).format(DateTimeFormatter.ofPattern("hh:mm a"))
+} catch (_: Exception) { "-" }

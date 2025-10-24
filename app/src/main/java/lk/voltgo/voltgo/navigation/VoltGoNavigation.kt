@@ -178,23 +178,24 @@ fun VoltGoNavigation(
                     onBackClick = { navController.popBackStack() }
                 )
             }
+            // Add this inside your main navigation graph
             composable(
-                route = "${Screen.NewReservation.route}/{stationId}/{slotId}/{reservationDateIso}",
+                route = "${Screen.NewReservation.route}/{stationId}/{physicalSlotNumber}/{reservationDateIso}/{startTimeIso}/{endTimeIso}",
                 arguments = listOf(
                     navArgument("stationId") { type = NavType.StringType },
-                    navArgument("slotId") { type = NavType.StringType },
+                    navArgument("physicalSlotNumber") { type = NavType.StringType },
                     navArgument("reservationDateIso") { type = NavType.StringType },
+                    navArgument("startTimeIso") { type = NavType.StringType },
+                    navArgument("endTimeIso") { type = NavType.StringType }
                 )
-            ) {
+            ) { backStackEntry ->
                 CreateReservationScreen(
                     onBackClick = { navController.popBackStack() },
-                    onSuccess = { bookingId ->
-                        // Navigate wherever you want after success (e.g., details or list)
-                        // navController.navigate(Screen.reservationDetailsRoute(bookingId))
-                        navController.popBackStack() // simple: go back
-                    }
+                    onSuccess = { navController.popBackStack() },
+                    navBackStackEntry = backStackEntry   // <-- pass args here
                 )
             }
+
             composable(Screen.Stations.route) {
                 // Stations Screen - displays available charging stations on map
                 StationsScreen(
@@ -222,11 +223,16 @@ fun VoltGoNavigation(
             ) {
                 SlotPickerScreen(
                     onBackClick = { navController.popBackStack() },
-                    onSelect = { stationId, slotId, reservationDateIso ->
-                        val s = Uri.encode(stationId)
-                        val sl = Uri.encode(slotId)
-                        val d = Uri.encode(reservationDateIso)
-                        navController.navigate("${Screen.NewReservation.route}/$s/$sl/$d")
+                    onConfirm = { stationId, slotNumber, reservationDate, startTime, endTime ->
+                        val encodedStationId = Uri.encode(stationId)
+                        val encodedDate = Uri.encode(reservationDate)
+                        val encodedStartTime = Uri.encode(startTime)
+                        val encodedEndTime = Uri.encode(endTime)
+                        val encodedSlot = Uri.encode(slotNumber.toString())
+
+                        navController.navigate(
+                            "${Screen.NewReservation.route}/$encodedStationId/$encodedSlot/$encodedDate/$encodedStartTime/$encodedEndTime"
+                        )
                     }
                 )
             }

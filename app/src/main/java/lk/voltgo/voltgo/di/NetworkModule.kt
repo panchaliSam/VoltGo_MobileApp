@@ -36,9 +36,9 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    //private const val BASE_URL = "http://10.0.2.2:5005"
+    private const val BASE_URL = "http://10.0.2.2:5005"
     //private const val BASE_URL = "http://192.168.1.88:5005"
-    private const val BASE_URL = "https://unbegged-crunchiest-selene.ngrok-free.dev"
+    //private const val BASE_URL = "https://unbegged-crunchiest-selene.ngrok-free.dev"
 
     // Provides the authentication interceptor that attaches the Bearer token to API requests.
     @Provides

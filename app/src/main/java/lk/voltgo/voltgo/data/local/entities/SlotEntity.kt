@@ -1,45 +1,39 @@
 /**
  * ------------------------------------------------------------
- * File: SlotEntity.kt
- * Author: Ishini Aposo
- * Date: 2025-10-10
- *
- * Description:
- * This file defines the Room entity representing a charging slot in the VoltGo app.
- * Each slot includes a start time, end time, and reservation date,
- * used to manage EV charging schedules and bookings.
+ * File: StationPhysicalSlotEntity.kt
+ * Author: Panchali Samarasinghe
+ * Date: 2025-10-24
+ * Description: Local table for per-connector states of a station.
+ * Mirrors backend StationPhysicalSlot: number, isActive, label, connectorType, maxKw.
+ * Composite PK: (station_id, number)
  * ------------------------------------------------------------
  */
-
 package lk.voltgo.voltgo.data.local.entities
+
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.PrimaryKey
-import java.sql.Date
 
-@Entity(tableName = "slot")
-data class SlotEntity(
-    @PrimaryKey
-    @ColumnInfo(name = "slot_id")
-    val slotId: String,
-
-    @ColumnInfo(name = "start_time")
-    val startTime: String, // ISO 8601 datetime string
-
-    @ColumnInfo(name = "end_time")
-    val endTime: String, // ISO 8601 datetime string
-
-    @ColumnInfo(name = "reservation_date")
-    val reservationDate: String, // ISO 8601 date string
-
-    @ColumnInfo(name = "description")
-    val description: String,
-
-    @ColumnInfo(name = "is_available")
-    val isAvailable: Boolean,
-
-    @ColumnInfo(name = "station_id")
-    val stationId: String
+@Entity(
+    tableName = "station_physical_slot",
+    primaryKeys = ["station_id", "number"]
 )
+data class StationPhysicalSlotEntity(
+    @ColumnInfo(name = "station_id")
+    val stationId: String,
 
+    // 1..n (unique per station)
+    @ColumnInfo(name = "number")
+    val number: Int,
+
+    @ColumnInfo(name = "is_active")
+    val isActive: Boolean = true,
+
+    @ColumnInfo(name = "label")
+    val label: String? = null,
+
+    @ColumnInfo(name = "connector_type")
+    val connectorType: String? = null, // e.g., "Type2", "CCS2", "CHAdeMO"
+
+    @ColumnInfo(name = "max_kw")
+    val maxKw: Double? = null
+)

@@ -18,15 +18,17 @@ data class ReservationResponse(
     val id: String,
     val ownerNIC: String,
     val stationId: String,
-    val slotId: String,
+    val physicalSlotNumber: Int,
     val reservationDate: String,
-    val createdAt: String,
-    val status: String,
-    val qrCode: String?,
-    val notes: String?,
-    val confirmedAt: String?,
-    val completedAt: String?,
-    val cancelledAt: String?,
+    val startTime: String,         // "2025-10-26T16:00:00Z"
+    val endTime: String,           // "2025-10-26T17:00:00Z"
+    val createdAt: String,         // "2025-10-24T03:53:41.802Z"
+    val status: String,            // "Confirmed" | "Pending" | ...
+    val qrCode: String?,           // JSON string (BookingId, etc.)
+    val notes: String?,            // e.g., "Benz E200"
+    val confirmedAt: String?,      // optional ISO-8601 timestamp
+    val completedAt: String?,      // optional ISO-8601 timestamp
+    val cancelledAt: String?,      // optional ISO-8601 timestamp
     val canBeModified: Boolean,
     val canBeCancelled: Boolean,
     val isWithin7Days: Boolean
@@ -51,10 +53,12 @@ data class ReservationDetailUi(
 )
 
 data class NewReservationRequest(
-    val stationId: String,
-    val slotId: String,
-    val reservationDate: String,
-    val notes: String?
+    val stationId: String,          // "68fa3f0a4935d1e55425dc40"
+    val physicalSlotNumber: Int,    // 2
+    val reservationDate: String,    // "2025-10-26T03:45:49.523Z"
+    val startTime: String,          // "2025-10-26T16:00:00.000Z"
+    val endTime: String,            // "2025-10-26T17:00:00.000Z"
+    val notes: String?              // "Benz E200"
 )
 
 data class NewReservationResponse(

@@ -1,22 +1,34 @@
+/**
+ * ------------------------------------------------------------
+ * File: Converters.kt
+ * Author: Panchali Samarasinghe
+ * Date: 2025-10-24
+ * Description: Room type converters for enums and (optionally) Instant.
+ * ------------------------------------------------------------
+ */
 package lk.voltgo.voltgo.data.local.converters
 
-
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.room.TypeConverter
 import lk.voltgo.voltgo.data.remote.types.StatusType
+import java.time.Instant
+import java.time.format.DateTimeFormatter
 
-object Converters {
+class Converters {
+
+    // ---- StatusType <-> String ----
     @TypeConverter
-    @JvmStatic
-    fun fromEnum(value: StatusType?): String? = value?.name // stores "Confirmed", "Pending", etc.
+    fun fromStatus(value: StatusType?): String? = value?.name
 
     @TypeConverter
-    @JvmStatic
-    fun toEnum(value: String?): StatusType =
-        when (value?.trim()?.lowercase()) {
-            "confirmed" -> StatusType.Confirmed
-            "pending"   -> StatusType.Pending
-            "completed" -> StatusType.Completed
-            "cancelled" -> StatusType.Cancelled
-            else        -> StatusType.Pending // last-ditch fallback
-        }
+    fun toStatus(value: String?): StatusType? = value?.let { StatusType.valueOf(it) }
+
+    // ---- Optional: Instant <-> ISO-8601 String (Z) ----
+    @TypeConverter
+    fun fromInstant(value: Instant?): String? = value?.toString()
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @TypeConverter
+    fun toInstant(value: String?): Instant? = value?.let { Instant.parse(it) }
 }

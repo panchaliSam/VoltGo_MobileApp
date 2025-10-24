@@ -27,6 +27,7 @@ import com.google.maps.android.compose.*
 import lk.voltgo.voltgo.ui.theme.AppColors
 import lk.voltgo.voltgo.ui.viewmodel.main.SlotDetailViewModel
 
+// File: SlotDetailScreen.kt
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SlotDetailScreen(
@@ -56,9 +57,7 @@ fun SlotDetailScreen(
                 .padding(16.dp)
         ) {
             when {
-                uiState.isLoading -> {
-                    CircularProgressIndicator(Modifier.align(Alignment.Center))
-                }
+                uiState.isLoading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
                 uiState.error != null -> {
                     Column(
                         Modifier.align(Alignment.Center),
@@ -71,6 +70,9 @@ fun SlotDetailScreen(
                 }
                 uiState.station != null -> {
                     val st = uiState.station!!
+                    val slots = uiState.physicalSlots
+                    val totalSlots = uiState.totalSlots
+
                     Column(
                         Modifier
                             .fillMaxSize()
@@ -103,9 +105,9 @@ fun SlotDetailScreen(
                                     fg = AppColors.TagConfirmedText,
                                     border = AppColors.TagConfirmedBorder
                                 )
-                                // Slots tag
+                                // Slots tag — uses uiState.totalSlots
                                 StatusTag(
-                                    label = "Slots: ${st.availableSlots ?: 0}",
+                                    label = "Slots: $totalSlots",
                                     bg = AppColors.TagPendingBg,
                                     fg = AppColors.TagPendingText,
                                     border = AppColors.TagPendingBorder
@@ -124,12 +126,58 @@ fun SlotDetailScreen(
                                 )
                                 InfoRow(title = "Type", value = st.type ?: "-")
                                 InfoRow(title = "Location", value = st.location ?: "-")
-                                InfoRow(title = "Available slots", value = "${st.availableSlots ?: 0}")
+                                InfoRow(title = "Available slots", value = "${st.availableSlots ?: totalSlots}")
                                 InfoRow(title = "Status", value = if (st.isActive) "Active" else "Inactive")
                             }
                         }
 
-                        // Map
+                        // --- Connectors section (NEW) ---
+                        if (slots.isNotEmpty()) {
+                            GradientCard {
+                                Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                    Text(
+                                        "Connectors",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = AppColors.DeepNavy,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+
+                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        slots.forEach { s ->
+                                            Row(
+                                                Modifier.fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Column {
+                                                    Text(
+                                                        s.label ?: "Slot ${s.number}",
+                                                        color = AppColors.DeepNavy,
+                                                        fontWeight = FontWeight.Medium
+                                                    )
+                                                    Text(
+                                                        buildString {
+                                                            append(s.connectorType ?: "N/A")
+                                                            s.maxKw?.let { append(" • ${it}kW") }
+                                                        },
+                                                        color = AppColors.DeepNavy.copy(alpha = 0.8f),
+                                                        style = MaterialTheme.typography.bodySmall
+                                                    )
+                                                }
+                                                StatusTag(
+                                                    label = if (s.isActive) "Available" else "Offline",
+                                                    bg = if (s.isActive) AppColors.TagCompletedBg else AppColors.TagPendingBg,
+                                                    fg = if (s.isActive) AppColors.TagCompletedText else AppColors.TagPendingText,
+                                                    border = if (s.isActive) AppColors.TagCompletedBorder else AppColors.TagPendingBorder
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Map (unchanged)
                         val lat = st.latitude ?: 0.0
                         val lng = st.longitude ?: 0.0
                         val cameraPositionState = rememberCameraPositionState {
@@ -166,22 +214,20 @@ fun SlotDetailScreen(
                             Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            // --- Navigate Button ---
+                            val anyActiveSlot = st.isActive && (slots.any { it.isActive } || (st.availableSlots ?: 0) > 0)
+
+                            // Navigate
                             Button(
                                 onClick = {
                                     if (st.isActive) {
-                                        val lat = st.latitude ?: 0.0
-                                        val lng = st.longitude ?: 0.0
                                         val label = Uri.encode(st.name)
                                         val uri = Uri.parse("google.navigation:q=$lat,$lng($label)&mode=d")
                                         val intent = Intent(Intent.ACTION_VIEW, uri).apply {
                                             setPackage("com.google.android.apps.maps")
                                         }
-
                                         try {
                                             context.startActivity(intent)
-                                        } catch (e: Exception) {
-                                            // Fallback: open in browser if Google Maps not installed
+                                        } catch (_: Exception) {
                                             val webUri = Uri.parse("https://www.google.com/maps/dir/?api=1&destination=$lat,$lng")
                                             context.startActivity(Intent(Intent.ACTION_VIEW, webUri))
                                         }
@@ -196,19 +242,21 @@ fun SlotDetailScreen(
                                     disabledContainerColor = Color(0xFFD3D3D3),
                                     disabledContentColor = Color.Black
                                 )
-                            ) {
-                                Text("Navigate", fontWeight = FontWeight.SemiBold)
-                            }
+                            ) { Text("Navigate", fontWeight = FontWeight.SemiBold) }
 
-                            // --- Reserve Slot Button ---
+                            // Reserve Slot
                             Button(
                                 onClick = { onReserve(st.id) },
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(14.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = AppColors.ElectricBlue)
-                            ) {
-                                Text("Reserve slot", fontWeight = FontWeight.SemiBold)
-                            }
+                                enabled = anyActiveSlot,
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (anyActiveSlot) AppColors.ElectricBlue else Color(0xFFD3D3D3),
+                                    contentColor = if (anyActiveSlot) AppColors.BrandWhite else Color.Black,
+                                    disabledContainerColor = Color(0xFFD3D3D3),
+                                    disabledContentColor = Color.Black
+                                )
+                            ) { Text("Reserve slot", fontWeight = FontWeight.SemiBold) }
                         }
                     }
                 }

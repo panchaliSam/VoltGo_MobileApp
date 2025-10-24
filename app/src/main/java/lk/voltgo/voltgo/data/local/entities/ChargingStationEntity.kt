@@ -1,3 +1,11 @@
+/**
+ * ------------------------------------------------------------
+ * File: ChargingStationEntity.kt
+ * Author: Panchali Samarasinghe
+ * Date: 2025-10-24
+ * Description: Local cache of charging stations (summary fields).
+ * ------------------------------------------------------------
+ */
 package lk.voltgo.voltgo.data.local.entities
 
 import androidx.room.ColumnInfo
@@ -13,14 +21,12 @@ data class ChargingStationEntity(
     @ColumnInfo(name = "name")
     val name: String,
 
-    // backend enum (AC/DC); keep as String locally
     @ColumnInfo(name = "type")
-    val type: String,
+    val type: String?,
 
     @ColumnInfo(name = "location")
-    val location: String,
+    val location: String?,
 
-    // nullable to mirror backend
     @ColumnInfo(name = "latitude")
     val latitude: Double?,
 
