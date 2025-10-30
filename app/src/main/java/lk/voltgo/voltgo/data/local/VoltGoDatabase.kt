@@ -33,7 +33,7 @@ import lk.voltgo.voltgo.data.local.seeders.ChargingStationSeeder
         UserEntity::class,
         ReservationEntity::class,
         ChargingStationEntity::class,
-        SlotEntity::class
+        StationPhysicalSlotEntity::class
     ],
     version = 1,                 // keep as 1 since fallbackToDestructiveMigration is enabled
     exportSchema = false
@@ -78,7 +78,6 @@ abstract class VoltGoDatabase : RoomDatabase() {
                             CoroutineScope(Dispatchers.IO).launch {
                                 // Seed in order (FK safety)
                                 UserSeeder.seed(createdInstance.userDao())
-                                ChargingStationSeeder.seed(createdInstance.chargingStationDao())
                             }
                         }
                     })
